@@ -1,15 +1,5 @@
 {
   "dependencies": {
-    "com.born.borncore": {
-      "version": "https://github.com/Born-Studios/BornCore.git?path=Assets/Package",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.cysharp.unitask": "2.3.1",
-        "jp.hadashikick.vcontainer": "1.11.1"
-      },
-      "hash": "1ce46c6558c7f8e2412168ff15de0e07128279c7"
-    },
     "com.cysharp.unitask": {
       "version": "2.3.3",
       "depth": 0,
@@ -65,18 +55,9 @@
     },
     "com.unity.ide.vscode": {
       "version": "1.2.5",
-      "depth": 0,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.inputsystem": {
-      "version": "1.4.4",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.uielements": "1.0.0"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.mono-cecil": {
@@ -159,16 +140,6 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
-    },
-    "com.unity.visualscripting": {
-      "version": "1.7.8",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
     },
     "jp.hadashikick.vcontainer": {
       "version": "1.11.1",
