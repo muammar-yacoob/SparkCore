@@ -1,0 +1,14 @@
+{
+  "name": "com.sparkgames.sparkcore",
+  "version": "0.1.0",
+  "displayName": "BornCore",
+  "description": "Core library for BornCore framework.",
+  "unity": "2021.3",
+  "dependencies": {
+    "com.cysharp.unitask": "2.3.1",
+    "jp.hadashikick.vcontainer" : "1.11.1"
+  },
+  "keywords": ["Framework","Unity","Core","Spark"],
+  "author": "Muammar Yacoob",
+  "license": "ISC"
+}
