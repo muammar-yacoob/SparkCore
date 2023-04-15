@@ -8,28 +8,13 @@ namespace SparkCore.Runtime.Extensions
     public static class EnumExtensions
     {
         /// <summary>
-        /// Extension method for getting "friendly" enum names:
+        /// Gets the enum name.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static String GetDescription(this Enum value)
+        /// <param name="e">Enum value.</param>
+        /// <returns>Enum name.</returns>
+        public static string GetDescription (this Enum e)
         {
-            Type type = value.GetType();
-            string name = Enum.GetName(type, value);
-            if (name != null)
-            {
-                FieldInfo field = type.GetField(name);
-                if (field != null)
-                {
-                    if (Attribute.GetCustomAttribute(field,
-                            typeof(DescriptionAttribute)) is DescriptionAttribute attr)
-                    {
-                        return attr.Description;
-                    }
-                }
-            }
-
-            return name;
+            return Enum.GetName(e.GetType(), e);
         }
 		
         public static T Next<T>(this T v) where T : struct
