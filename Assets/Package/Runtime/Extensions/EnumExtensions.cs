@@ -26,5 +26,17 @@ namespace SparkCore.Runtime.Extensions
         {
             return Enum.GetValues(v.GetType()).Cast<T>().Concat(new[] { default(T) }).Reverse().SkipWhile(e => !v.Equals(e)).Skip(1).First();
         }
+        
+        public static bool IsFirst<TEnum>(this TEnum enumValue) where TEnum : Enum
+        {
+            var minValue = Enum.GetValues(enumValue.GetType()).OfType<TEnum>().Min();
+            return enumValue.Equals(minValue);
+        }
+        
+        public static bool IsLast<TEnum>(this TEnum enumValue) where TEnum : Enum
+        {
+            var maxValue = Enum.GetValues(enumValue.GetType()).OfType<TEnum>().Max();
+            return enumValue.Equals(maxValue);
+        }
     }
 }
