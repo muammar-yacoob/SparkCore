@@ -1,46 +1,73 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
 namespace SparkCore.Editor.Setup
 {
     public static class Packages
     {
-        private const string MainfestGistID = "65d3a8c9be7d1a441419641af1b66701";
-        public static async void InstallCoreDependencies()
-        {
-            var url = GetGistUrl(MainfestGistID);
-            var contents = await GetContents(url);
-            ReplacePackageFile(contents);
-        }
+        private static Dictionary<AddRequest, Action> updateCallbacks = new Dictionary<AddRequest, Action>();
 
-        private static string GetGistUrl(string id, string user = "muammar-yacoob")
+        public static void InstallCoreDependencies()
         {
-            return $"https://gist.githubusercontent.com/{user}/{id}/raw";
-        }
-
-        private static async Task<string> GetContents(string url)
-        {
-            using (var client = new HttpClient())
+            List<string> packageIds = new List<string>()
             {
-                var response = await client.GetAsync(url);
-                var content = await response.Content.ReadAsStringAsync();
-                return content;
+                "com.unity.inputsystem"
+                // ,"com.cysharp.unitask"
+                // ,"com.verraes.vcontainer"
+            };
+            packageIds.ForEach(packageId => Install(packageId));
+        }
+
+        public static void InstallXR()
+        {
+            List<string> packageIds = new List<string>()
+            {
+                "com.unity.xr.management",
+                "com.unity.xr.interaction.toolkit"
+            };
+            packageIds.ForEach(packageId => Install(packageId));
+        }
+
+        public static void Install(string packageId)
+        {
+            var request = Client.Add(packageId);
+            var updateCallback = new Action(() => CheckAndInstall(packageId, request));
+            updateCallbacks[request] = updateCallback;
+            EditorApplication.update += updateCallback.Invoke;
+        }
+
+        private static void CheckAndInstall(string packageId, AddRequest request)
+        {
+            if (request.IsCompleted)
+            {
+                if (request.Status == StatusCode.Success)
+                {
+                    Debug.Log($"{packageId.PackageName()} installed successfully!");
+                }
+                else if (request.Status >= StatusCode.Failure)
+                {
+                    Debug.LogError($"Failed to install {packageId.PackageName()}: {request.Error.message}");
+                }
+
+                var updateCallback = updateCallbacks[request];
+                EditorApplication.update -= updateCallback.Invoke;
+                updateCallbacks.Remove(request);
             }
         }
 
-        private static void ReplacePackageFile(string contents)
+        private static string PackageName(this string packageId)
         {
-            var existing = Path.Combine(Application.dataPath, "../Packages/manifest.json");
-            File.WriteAllText(existing, contents);
-            Client.Resolve();
-        }
+            int lastDotIndex = packageId.LastIndexOf('.');
+            if (lastDotIndex >= 0 && lastDotIndex < packageId.Length - 1)
+            {
+                return packageId.Substring(lastDotIndex + 1);
+            }
 
-        public static void InstallUnityPackage(string packageName)
-        {
-             UnityEditor.PackageManager.Client.Add($"com.unity.{packageName}");
+            return packageId;
         }
     }
 }
