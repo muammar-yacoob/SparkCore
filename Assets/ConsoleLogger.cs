@@ -10,7 +10,7 @@ namespace SparkCoreDev
         public void Log(string message) => Debug.Log($"ConsoleLogger: {message}");
     }
     
-    [Injectable(Lifetime.Transient)]
+    [Injectable(Lifetime.Singleton)]
     public class AnotherLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"AnotherLogger: {message}");

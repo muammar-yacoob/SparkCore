@@ -11,9 +11,8 @@ namespace SparkCore.Editor.Utils
         {
             Debug.Log($"Starting up from {nameof(Bootstrapper)}");
 
-            //RuntimeInjector.Initialize();
-            //LoadResource("Injector");
             LoadResource("Debugger");
+            LoadResource("Runtime Injector");
         }
 
         private static void LoadResource(string prefabName)

@@ -5,7 +5,7 @@ namespace SparkCoreDev
 {
     public class InjectionTest : InjectableMonoBehaviour
     {
-        [Inject] private ConsoleLogger logger;
+        [Inject] private ILogger logger;
 
         private void OnEnable()
         {

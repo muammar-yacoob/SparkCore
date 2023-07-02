@@ -8,9 +8,12 @@ namespace SparkCore.Runtime.Utils
         private void Awake()
         {
 #if UNITY_EDITOR
-            SceneManager.LoadScene(0);
-            //ClearConsole();
             Debug.Log($"{nameof(Debugger)} instantiated", this);
+            if(SceneManager.GetActiveScene().buildIndex != 0)
+            {
+                SceneManager.LoadScene(0);
+            }
+            //ClearConsole();
 #endif
         }
         
