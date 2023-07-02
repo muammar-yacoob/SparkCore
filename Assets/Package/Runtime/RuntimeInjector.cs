@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Palmmedia.ReportGenerator.Core.Logging;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -27,13 +28,13 @@ namespace SparkCore.Runtime
 
         protected override void Configure(IContainerBuilder builder)
         {
-            AutoInject(builder);
+            AutoRegister(builder);
 
             //manual registration to enforce custom implementations.
             //builder.Register<ILogger,ConsoleLogger>(Lifetime.Singleton);
         }
 
-        private static void AutoInject(IContainerBuilder builder)
+        private static void AutoRegister(IContainerBuilder builder)
         {
             var scriptAssemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => a.GetName().Name.StartsWith("Assembly-CSharp"));
@@ -51,6 +52,7 @@ namespace SparkCore.Runtime
                     .AsImplementedInterfaces()
                     .AsSelf();
             }
+            Debug.Log(injectableTypes.Count() + " types registered with VContainer");
         }
 
     }
