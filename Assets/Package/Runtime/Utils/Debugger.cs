@@ -9,7 +9,7 @@ namespace SparkCore.Runtime.Utils
         {
 #if UNITY_EDITOR
             SceneManager.LoadScene(0);
-            ClearConsole();
+            //ClearConsole();
             Debug.Log($"{nameof(Debugger)} instantiated", this);
 #endif
         }
