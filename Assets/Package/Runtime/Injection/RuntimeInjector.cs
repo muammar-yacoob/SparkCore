@@ -35,8 +35,7 @@ namespace SparkCore.Runtime.Injection
 
         private static void AutoRegister(IContainerBuilder builder)
         {
-            var scriptAssemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.GetName().Name.StartsWith("Assembly-CSharp"));
+            var scriptAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
             var injectableTypes = scriptAssemblies
                 .SelectMany(a => a.GetTypes())
