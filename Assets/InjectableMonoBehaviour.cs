@@ -1,7 +1,7 @@
 using SparkCore.Runtime;
 using UnityEngine;
 
-namespace SparkCore.Runtime
+namespace SparkCoreDev
 {
     public class InjectableMonoBehaviour : MonoBehaviour
     {
