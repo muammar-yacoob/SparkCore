@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Palmmedia.ReportGenerator.Core.Logging;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace SparkCore.Runtime
+namespace SparkCore.Runtime.Injection
 {
     public class RuntimeInjector : LifetimeScope
     {

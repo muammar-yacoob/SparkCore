@@ -1,7 +1,7 @@
 using System;
 using VContainer;
 
-namespace SparkCore.Runtime
+namespace SparkCore.Runtime.Injection
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class Injectable : Attribute
