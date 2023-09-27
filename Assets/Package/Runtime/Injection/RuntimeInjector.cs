@@ -39,19 +39,29 @@ namespace SparkCore.Runtime.Injection
 
             var injectableTypes = scriptAssemblies
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.GetCustomAttribute<Injectable>() != null);
+                .Where(t => t.GetCustomAttribute<RuntimeObject>() != null);
 
             // Register with VContainer
             foreach (var type in injectableTypes)
             {
-                var lifetime = type.GetCustomAttribute<Injectable>().Lifetime;
+                var lifetime = type.GetCustomAttribute<RuntimeObject>().RuntimeObjectType;
 
-                builder.Register(type, lifetime)
+                builder.Register(type, MapToVContainerLifetime(lifetime))
                     .AsImplementedInterfaces()
                     .AsSelf();
+                Debug.Log($"{type.Name} registered with VContainer");
             }
             Debug.Log(injectableTypes.Count() + " types registered with VContainer");
         }
-
+        
+        private static Lifetime MapToVContainerLifetime(RuntimeObjectType runtimeObjectType)
+        {
+            return runtimeObjectType switch
+            {
+                RuntimeObjectType.Singleton => Lifetime.Singleton,
+                RuntimeObjectType.Transient => Lifetime.Transient,
+                _ => Lifetime.Singleton,
+            };
+        }
     }
 }
