@@ -5,13 +5,15 @@ namespace SparkDev.Demo.EventsTest
 {
     public class SubscriberMono : InjectableMonoBehaviour
     {
-        protected override void Awake()
+        private void OnEnable()
         {
-            base.Awake();
             SubscribeEvent<CustomEvent>(HandleCustomEvent);
         }
 
-        private void OnDestroy() => UnsubscribeEvent<CustomEvent>(HandleCustomEvent);
+        private void OnDisable()
+        {
+            UnsubscribeEvent<CustomEvent>(HandleCustomEvent);
+        }
 
         void HandleCustomEvent(CustomEvent customEvent)
         {

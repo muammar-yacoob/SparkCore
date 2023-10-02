@@ -7,38 +7,45 @@ namespace SparkCore.Runtime.Core
 {
     public abstract class InjectableMonoBehaviour : MonoBehaviour
     {
+        #region Injection
+
         protected virtual void Awake()
         {
             var container = RuntimeInjector.Instance.Container;
             container.Inject(this);
         }
-        
-        private readonly List<Action> unsubscribeActions = new List<Action>();
+
+        #endregion
+
+        #region Event Subscriptions
+        private readonly Dictionary<Delegate, Action> delegateToUnsubscribeAction = new Dictionary<Delegate, Action>();
+
         protected void PublishEvent<T>(T eventType)
         {
             EventManager.Instance.PublishEvent(eventType);
         }
-
+        
         protected void SubscribeEvent<T>(Action<T> action)
         {
             EventManager.Instance.SubscribeEvent(action);
-            unsubscribeActions.Add(() => EventManager.Instance.UnsubscribeEvent(action));
+            delegateToUnsubscribeAction[action] = () => EventManager.Instance.UnsubscribeEvent(action);
         }
-        
+
         protected void UnsubscribeEvent<T>(Action<T> action)
         {
             EventManager.Instance.UnsubscribeEvent(action);
-            unsubscribeActions.Remove(() => EventManager.Instance.UnsubscribeEvent(action));
+            delegateToUnsubscribeAction.Remove(action);
         }
 
         private void OnDestroy()
         {
-            foreach (var unsubscribeAction in unsubscribeActions)
+            foreach (var unsubscribeAction in delegateToUnsubscribeAction.Values)
             {
                 unsubscribeAction?.Invoke();
             }
 
-            unsubscribeActions.Clear();
+            delegateToUnsubscribeAction.Clear();
         }
     }
+    #endregion
 }
