@@ -1,17 +1,15 @@
-﻿using SparkCore.Runtime;
-using SparkCore.Runtime.Injection;
+﻿using SparkCore.Runtime.Injection;
 using UnityEngine;
-using VContainer;
 
-namespace SparkCoreDev
+namespace SparkDev.Demo.InjectionTest
 {
-    [Injectable(Lifetime.Singleton)]
+    [RuntimeObject(RuntimeObjectType.Singleton)]
     public class ConsoleLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"ConsoleLogger: {message}");
     }
     
-    [Injectable(Lifetime.Singleton)]
+    [RuntimeObject(RuntimeObjectType.Singleton)]
     public class AnotherLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"AnotherLogger: {message}");
