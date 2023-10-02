@@ -15,7 +15,7 @@ namespace SparkDev.Demo.EventsTest
 
         void HandleCustomEvent(CustomEvent customEvent)
         {
-            Debug.Log($"Received event: {customEvent.Message}");
+            Debug.Log($"[Mono] Received event: {customEvent.Message}");
         }
     }
 }
