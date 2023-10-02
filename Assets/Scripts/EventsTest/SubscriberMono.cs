@@ -1,4 +1,3 @@
-using System;
 using SparkCore.Runtime.Core;
 using UnityEngine;
 
@@ -6,7 +5,7 @@ namespace SparkDev.Demo.EventsTest
 {
     public class SubscriberMono : InjectableMonoBehaviour
     {
-        void Awake()
+        protected override void Awake()
         {
             base.Awake();
             SubscribeEvent<CustomEvent>(HandleCustomEvent);
