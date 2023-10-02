@@ -11,7 +11,7 @@ namespace SparkDev.Demo.EventsTest
             SubscribeEvent<CustomEvent>(HandleCustomEvent);
         }
 
-        //private void OnDestroy() => UnsubscribeEvent<CustomEvent>(HandleEvent);
+        private void OnDestroy() => UnsubscribeEvent<CustomEvent>(HandleCustomEvent);
 
         void HandleCustomEvent(CustomEvent customEvent)
         {

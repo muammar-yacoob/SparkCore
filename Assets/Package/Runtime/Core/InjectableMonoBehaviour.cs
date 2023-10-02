@@ -21,5 +21,10 @@ namespace SparkCore.Runtime.Core
         {
             EventManager.Instance.SubscribeEvent(action);
         }
+        
+        protected void UnsubscribeEvent<T>(Action<T> action)
+        {
+            EventManager.Instance.UnsubscribeEvent(action);
+        }
     }
 }
