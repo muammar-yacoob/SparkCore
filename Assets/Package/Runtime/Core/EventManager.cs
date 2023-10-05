@@ -36,8 +36,9 @@ public sealed class EventManager
         Type type = typeof(T);
         if (eventDictionary.TryGetValue(type, out var thisEvent))
         {
-            foreach (var del in thisEvent)
+            for (int i = thisEvent.Count - 1; i >= 0; i--)
             {
+                var del = thisEvent[i];
                 if (del is Action<T> action)
                 {
                     action?.Invoke(eventType);
