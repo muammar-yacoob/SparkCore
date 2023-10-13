@@ -1,8 +1,8 @@
 {
   "name": "com.sparkgames.sparkcore",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "Spark Core",
-  "description": "Core library for BornCore framework.",
+  "description": "Core library for common Unity Projects.",
   "unity": "2021.3",
   "keywords": ["Framework","Unity","Core","Spark"],
   "author": "Spark Games",
