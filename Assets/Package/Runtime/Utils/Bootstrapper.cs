@@ -1,25 +1,20 @@
-﻿using System.Diagnostics;
-using SparkCore.Runtime.Injection;
+﻿using SparkCore.Runtime.Injection;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace SparkCore.Runtime.Utils
 {
     /// <summary>
-    /// Startup class for editor. Loads debugger and runtime injector from Resources folder.
+    /// Startup class that loads the runtime injector from the Resources folder.
     /// </summary>
     public static class Bootstrapper
     {
-        private const string _debugger = "Debugger";
         private const string _runtimeInjector = "Runtime Injector";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Startup()
         {
             Debug.Log($"Starting up from {nameof(Bootstrapper)}");
-            
-            var Debugger = Object.FindObjectsOfType(typeof(Debugger));
-            if (Debugger.Length == 0) LoadResource(Bootstrapper._debugger);
 
             var RuntimeInjector = Object.FindObjectsOfType(typeof(RuntimeInjector));
             if (RuntimeInjector.Length == 0) LoadResource(Bootstrapper._runtimeInjector);
