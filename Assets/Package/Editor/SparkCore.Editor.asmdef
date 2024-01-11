@@ -2,9 +2,7 @@
     "name": "SparkCore.Editor",
     "rootNamespace": "SparkCore.Editor",
     "references": [
-        "GUID:29a97fdb28605cd4d991b4c80c33def2",
-        "GUID:4129704b5a1a13841ba16f230bf24a57",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+        "GUID:29a97fdb28605cd4d991b4c80c33def2"
     ],
     "includePlatforms": [
         "Editor"
