@@ -1,6 +1,14 @@
-# SparkCore Framework
 
-Welcome to the SparkCore framework, a powerful tool for Unity3D development, designed with the following principles in mind: SOLID, highly optimized, DRY code, and testability. This framework leverages Unity3D and OpenXR for a seamless development experience.
+
+# SparkCore Framework
+![Build Status](https://img.shields.io/badge/build-Passing-success?style=flat)
+![Version](https://img.shields.io/badge/version-1.0.1-blue?style=flat)
+![License](https://img.shields.io/badge/license-MIT-yellow?style=flat)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat)
+
+Welcome to **SparkCore**, a simple to use Unity3D framework mainly built for code reusability and testability in mind. SparkCore simplifies Unity development by automating dependency injection and decoupling event handling for a seamless development experience.
+
+   <img src="./res/imgs/sparkcore.png" alt="SparkCore" width="200" height="200">
 
 ## Table of Contents
 - [Installation](#installation)
