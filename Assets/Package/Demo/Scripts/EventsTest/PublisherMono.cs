@@ -6,7 +6,7 @@ namespace SparkDev.Demo.EventsTest
     {
         private void OnEnable()
         {
-            CustomEvent customEvent = new CustomEvent("Hello Events from Mono!");
+            var customEvent = new CustomEvent("Hello Events from Mono!");
             PublishEvent(customEvent);
             
             // SubscriberPOCO subscriberPoco = new SubscriberPOCO();
