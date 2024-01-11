@@ -9,7 +9,7 @@ namespace SparkDev.Demo.InjectionTest
 
         private void OnEnable()
         {
-            logger.Log("Hello World!");
+            logger.Log("Hello Injection!");
         }
     }
 }
