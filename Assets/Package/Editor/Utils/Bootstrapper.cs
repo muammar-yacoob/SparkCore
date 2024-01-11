@@ -1,8 +1,10 @@
-﻿using SparkCore.Runtime;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SparkCore.Editor.Utils
 {
+    /// <summary>
+    /// Startup class for editor. Loads debugger and runtime injector from Resources folder.
+    /// </summary>
     public static class Bootstrapper
     {
 #if UNITY_EDITOR
@@ -14,7 +16,7 @@ namespace SparkCore.Editor.Utils
             LoadResource("Debugger");
             LoadResource("Runtime Injector");
         }
-
+        
         private static void LoadResource(string prefabName)
         {
             var sceneObject = GameObject.Find(prefabName);
