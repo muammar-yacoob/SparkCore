@@ -3,13 +3,24 @@ using System.Collections.Generic;
 
 namespace SparkCore.Runtime.Core
 {
+    /// <summary>
+    ///  Handles event subscriptions and publishing.
+    /// </summary>
     public sealed class EventManager
     {
         private static readonly Lazy<EventManager> lazy = new(() => new EventManager());
+        /// <summary>
+        /// Singleton instance of the EventManager.
+        /// </summary>
         public static EventManager Instance => lazy.Value;
 
         private readonly Dictionary<Type, List<Delegate>> eventDictionary = new Dictionary<Type, List<Delegate>>();
 
+        /// <summary>
+        /// Subscribe to an event.
+        /// </summary>
+        /// <param name="action">Action to be invoked when the event is published. </param>
+        /// <typeparam name="T">Event type </typeparam>
         public void SubscribeEvent<T>(Action<T> action)
         {
             Type type = typeof(T);
@@ -20,6 +31,11 @@ namespace SparkCore.Runtime.Core
             eventDictionary[type].Add(action);
         }
 
+        /// <summary>
+        /// Unsubscribe from an event.
+        /// </summary>
+        /// <param name="action">Action to unsubscribe from. </param>
+        /// <typeparam name="T">Event type </typeparam>
         public void UnsubscribeEvent<T>(Action<T> action)
         {
             Type type = typeof(T);
@@ -33,6 +49,11 @@ namespace SparkCore.Runtime.Core
             }
         }
 
+        /// <summary>
+        /// Publish an event.
+        /// </summary>
+        /// <param name="eventType">Event to publish. </param>
+        /// <typeparam name="T">Event type </typeparam>
         public void PublishEvent<T>(T eventType)
         {
             Type type = typeof(T);
