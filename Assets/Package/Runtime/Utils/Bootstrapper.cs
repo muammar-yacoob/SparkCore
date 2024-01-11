@@ -1,20 +1,28 @@
-﻿using UnityEngine;
+﻿using System.Diagnostics;
+using SparkCore.Runtime.Injection;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
-namespace SparkCore.Editor.Utils
+namespace SparkCore.Runtime.Utils
 {
     /// <summary>
     /// Startup class for editor. Loads debugger and runtime injector from Resources folder.
     /// </summary>
     public static class Bootstrapper
     {
-#if UNITY_EDITOR
+        private const string _debugger = "Debugger";
+        private const string _runtimeInjector = "Runtime Injector";
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Startup()
         {
             Debug.Log($"Starting up from {nameof(Bootstrapper)}");
+            
+            var Debugger = Object.FindObjectsOfType(typeof(Debugger));
+            if (Debugger.Length == 0) LoadResource(Bootstrapper._debugger);
 
-            LoadResource("Debugger");
-            LoadResource("Runtime Injector");
+            var RuntimeInjector = Object.FindObjectsOfType(typeof(RuntimeInjector));
+            if (RuntimeInjector.Length == 0) LoadResource(Bootstrapper._runtimeInjector);
         }
         
         private static void LoadResource(string prefabName)
@@ -32,6 +40,5 @@ namespace SparkCore.Editor.Utils
                 Object.DontDestroyOnLoad((Object.Instantiate(prefab)));
             }
         }
-#endif
     }
 }
