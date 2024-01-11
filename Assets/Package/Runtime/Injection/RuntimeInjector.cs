@@ -7,6 +7,9 @@ using VContainer.Unity;
 
 namespace SparkCore.Runtime.Injection
 {
+    /// <summary>
+    /// Responsible for registering all types with the <see cref="RuntimeObject"/> attribute with VContainer.
+    /// </summary>
     public class RuntimeInjector : LifetimeScope
     {
         public static RuntimeInjector Instance { get; private set; }
@@ -28,9 +31,6 @@ namespace SparkCore.Runtime.Injection
         protected override void Configure(IContainerBuilder builder)
         {
             AutoRegister(builder);
-
-            //manual registration to enforce custom implementations.
-            //builder.Register<ILogger,ConsoleLogger>(Lifetime.Singleton);
         }
 
         private static void AutoRegister(IContainerBuilder builder)

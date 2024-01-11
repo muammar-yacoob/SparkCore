@@ -1,47 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public sealed class EventManager
+namespace SparkCore.Runtime.Core
 {
-    private static readonly Lazy<EventManager> lazy = new(() => new EventManager());
-    public static EventManager Instance => lazy.Value;
-
-    private readonly Dictionary<Type, List<Delegate>> eventDictionary = new Dictionary<Type, List<Delegate>>();
-
-    public void SubscribeEvent<T>(Action<T> action)
+    public sealed class EventManager
     {
-        Type type = typeof(T);
-        if (!eventDictionary.ContainsKey(type))
-        {
-            eventDictionary[type] = new List<Delegate>();
-        }
-        eventDictionary[type].Add(action);
-    }
+        private static readonly Lazy<EventManager> lazy = new(() => new EventManager());
+        public static EventManager Instance => lazy.Value;
 
-    public void UnsubscribeEvent<T>(Action<T> action)
-    {
-        Type type = typeof(T);
-        if (eventDictionary.TryGetValue(type, out var existing))
+        private readonly Dictionary<Type, List<Delegate>> eventDictionary = new Dictionary<Type, List<Delegate>>();
+
+        public void SubscribeEvent<T>(Action<T> action)
         {
-            existing.Remove(action);
-            if (existing.Count == 0)
+            Type type = typeof(T);
+            if (!eventDictionary.ContainsKey(type))
             {
-                eventDictionary.Remove(type);
+                eventDictionary[type] = new List<Delegate>();
+            }
+            eventDictionary[type].Add(action);
+        }
+
+        public void UnsubscribeEvent<T>(Action<T> action)
+        {
+            Type type = typeof(T);
+            if (eventDictionary.TryGetValue(type, out var existing))
+            {
+                existing.Remove(action);
+                if (existing.Count == 0)
+                {
+                    eventDictionary.Remove(type);
+                }
             }
         }
-    }
 
-    public void PublishEvent<T>(T eventType)
-    {
-        Type type = typeof(T);
-        if (eventDictionary.TryGetValue(type, out var thisEvent))
+        public void PublishEvent<T>(T eventType)
         {
-            for (int i = thisEvent.Count - 1; i >= 0; i--)
+            Type type = typeof(T);
+            if (eventDictionary.TryGetValue(type, out var thisEvent))
             {
-                var del = thisEvent[i];
-                if (del is Action<T> action)
+                for (int i = thisEvent.Count - 1; i >= 0; i--)
                 {
-                    action?.Invoke(eventType);
+                    var del = thisEvent[i];
+                    if (del is Action<T> action)
+                    {
+                        action?.Invoke(eventType);
+                    }
                 }
             }
         }

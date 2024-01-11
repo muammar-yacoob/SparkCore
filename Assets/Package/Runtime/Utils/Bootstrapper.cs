@@ -1,20 +1,25 @@
-﻿using SparkCore.Runtime;
+﻿using SparkCore.Runtime.Injection;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
-namespace SparkCore.Editor.Utils
+namespace SparkCore.Runtime.Utils
 {
+    /// <summary>
+    /// Startup class that loads the runtime injector from the Resources folder.
+    /// </summary>
     public static class Bootstrapper
     {
-#if UNITY_EDITOR
+        private const string _runtimeInjector = "Runtime Injector";
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Startup()
         {
             Debug.Log($"Starting up from {nameof(Bootstrapper)}");
 
-            LoadResource("Debugger");
-            LoadResource("Runtime Injector");
+            var RuntimeInjector = Object.FindObjectsOfType(typeof(RuntimeInjector));
+            if (RuntimeInjector.Length == 0) LoadResource(Bootstrapper._runtimeInjector);
         }
-
+        
         private static void LoadResource(string prefabName)
         {
             var sceneObject = GameObject.Find(prefabName);
@@ -30,6 +35,5 @@ namespace SparkCore.Editor.Utils
                 Object.DontDestroyOnLoad((Object.Instantiate(prefab)));
             }
         }
-#endif
     }
 }

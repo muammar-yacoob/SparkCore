@@ -1,3 +1,5 @@
+using SparkCore.Runtime.Core;
+
 namespace SparkDev.Demo.EventsTest
 {
     public class SubscriberPOCO
