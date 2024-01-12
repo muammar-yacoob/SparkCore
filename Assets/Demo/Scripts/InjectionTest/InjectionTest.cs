@@ -1,6 +1,7 @@
 using SparkCore.Runtime.Core;
 using SparkCore.Runtime.Injection;
-namespace SparkDev.Demo.InjectionTest
+
+namespace SparkCoreDev.Demo.InjectionTest
 {
     public class InjectionTest : InjectableMonoBehaviour
     {

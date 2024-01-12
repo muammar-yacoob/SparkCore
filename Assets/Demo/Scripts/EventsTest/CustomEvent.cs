@@ -1,6 +1,8 @@
-﻿namespace SparkDev.Demo.EventsTest
+﻿using SparkDev.Demo.EventsTest;
+
+namespace SparkCoreDev.Demo.EventsTest
 {
-    public class CustomEvent
+    public class CustomEvent : SceneEvent
     {
         public readonly string Message;
 

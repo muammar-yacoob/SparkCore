@@ -1,7 +1,7 @@
 ﻿using SparkCore.Runtime.Injection;
 using UnityEngine;
 
-namespace SparkDev.Demo.InjectionTest
+namespace SparkCoreDev.Demo.InjectionTest
 {
     [RuntimeObject(RuntimeObjectType.Singleton)]
     public class ConsoleLogger : ILogger
