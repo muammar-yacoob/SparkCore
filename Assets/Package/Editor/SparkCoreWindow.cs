@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using SparkCore.Runtime.Core;
-using SparkDev.Demo.EventsTest;
+using SparkCore.Runtime.Core.Events;
 using UnityEditor;
 using UnityEngine;
 using VContainer;

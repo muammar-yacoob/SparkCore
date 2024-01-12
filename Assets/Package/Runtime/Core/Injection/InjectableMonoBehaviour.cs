@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SparkCore.Runtime.Core.Events;
 using SparkCore.Runtime.Injection;
 using UnityEngine;
 using VContainer;
 
-namespace SparkCore.Runtime.Core
+namespace SparkCore.Runtime.Core.Injection
 {
     /// <summary>
     ///   Base class for all MonoBehaviours that want to use Dependency Injection and Event Subscriptions.
@@ -23,22 +24,6 @@ namespace SparkCore.Runtime.Core
             InjectFields(injectableMonoBehaviour, container);
             InjectProperties(injectableMonoBehaviour, container);
         }
-
-        private static void InjectProperties(object injectableMonoBehaviour, IObjectResolver container)
-        {
-            var properties = injectableMonoBehaviour.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(f => f.IsDefined(typeof(Inject), true));
-
-            foreach (var property in properties)
-            {
-                var injectAttribute = property.GetCustomAttribute<Inject>(true);
-                var typeToInject = injectAttribute?.ImplementationType ?? property.PropertyType;
-                
-                var resolvedInstance = container.Resolve(typeToInject);
-                property.SetValue(injectableMonoBehaviour, resolvedInstance);
-            }
-        }
-
         private static void InjectFields(object injectableMonoBehaviour, IObjectResolver container)
         {
             var fields = injectableMonoBehaviour.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -51,6 +36,21 @@ namespace SparkCore.Runtime.Core
 
                 var resolvedInstance = container.Resolve(typeToInject);
                 field.SetValue(injectableMonoBehaviour, resolvedInstance);
+            }
+        }
+        
+        private static void InjectProperties(object injectableMonoBehaviour, IObjectResolver container)
+        {
+            var properties = injectableMonoBehaviour.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(p => p.IsDefined(typeof(Inject), true));
+
+            foreach (var property in properties)
+            {
+                var injectAttribute = property.GetCustomAttribute<Inject>(true);
+                var typeToInject = injectAttribute?.ImplementationType ?? property.PropertyType;
+                
+                var resolvedInstance = container.Resolve(typeToInject);
+                property.SetValue(injectableMonoBehaviour, resolvedInstance);
             }
         }
 

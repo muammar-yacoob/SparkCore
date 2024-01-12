@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SparkDev.Demo.EventsTest;
 
-namespace SparkCore.Runtime.Core
+namespace SparkCore.Runtime.Core.Events
 {
     /// <summary>
     ///  Handles event subscriptions and publishing.
