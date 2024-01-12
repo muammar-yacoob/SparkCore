@@ -1,7 +1,8 @@
 using SparkCore.Runtime.Core;
+using SparkCore.Runtime.Core.Injection;
 using UnityEngine;
 
-namespace SparkCoreDev.Demo.EventsTest
+namespace SparkCoreDev.Demo.Events_Demo
 {
     public class SubscriberMono : InjectableMonoBehaviour
     {
