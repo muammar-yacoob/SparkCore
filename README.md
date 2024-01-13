@@ -8,7 +8,8 @@
 
 Welcome to **SparkCore**, a simple to use Unity3D framework mainly built for code reusability and testability in mind. SparkCore simplifies Unity development by automating dependency injection and decoupling event handling for a seamless development experience.
 
-   <img src="./res/imgs/sparkcore.png" alt="SparkCore" width="200" height="200">
+   <img src="./res/imgs/sparkcore.png" alt="SparkCore" width="200" eight="200">
+   
 
 ## Table of Contents
 - [Installation](#installation)
@@ -18,7 +19,7 @@ Welcome to **SparkCore**, a simple to use Unity3D framework mainly built for cod
     - [Singletons](#singletons)
     - [Bootstrapper](#bootstrapper)
     - [Debugger](#debugger)
-- [Class Diagram](#mermaid-class-diagram)
+- [Editor Window](#editor-window)
 
 ## Installation
 In Unity Package Manager (UPM) Add Package from git URL:<BR>
@@ -155,3 +156,10 @@ sequenceDiagram
     A->>B: Publish Event
     B->>C: Notify Event Subscriber
    ```
+<br><br>
+
+### Editor Window
+The Injection/Events window can be accessed from the main menu strip in Unity. Also, classes derived from `InjectableMonoBehaviour` have a custom inspector panel.
+<br>
+
+<img src="./res/imgs/EditorWindow.png" alt="SparkCxore" width="878">
