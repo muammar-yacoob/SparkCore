@@ -30,7 +30,7 @@ namespace SparkCore.Editor
         {
             //Header
             GUILayout.Label($"SparkCore", skin.GetStyle("CustomHeader"));
-            GUILayout.Label($"Scene Behaviour", skin.GetStyle("CustomH1"));
+            GUILayout.Label($"Injectable MonoBehaviour", skin.GetStyle("CustomH1"));
             headerRect = new Rect(Screen.width - headerTexture.width * headerTexScale, 0,
                 headerTexture.width * headerTexScale, headerTexture.height * headerTexScale);
             GUI.DrawTexture(headerRect, headerTexture);
