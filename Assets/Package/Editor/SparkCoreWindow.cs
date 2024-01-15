@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using SparkCore.Runtime.Core;
@@ -43,26 +44,26 @@ namespace SparkCore.Editor
 
         #region Menus
 
-        [MenuItem("SparkCore/Injection Manager &B", false, 11)]
+        [MenuItem("Spark Core/Injection Manager &B", false, 11)]
         public static void OpenInjectionWindow() => OpenMainWindow(0);
 
-        [MenuItem("SparkCore/Injection Manager &I", true, 11)]
+        [MenuItem("Spark Core/Injection Manager &I", true, 11)]
         private static bool Validate_OpenInjectionWindow() => !Application.isPlaying;
 
-        [MenuItem("SparkCore/Scene Events", false, 12)]
+        [MenuItem("Spark Core/Scene Events", false, 12)]
         public static void OpenSceneWindow() => OpenMainWindow(1);
 
-        [MenuItem("SparkCore/Scene Events", true, 12)]
+        [MenuItem("Spark Core/Scene Events", true, 12)]
         private static bool Validate_OpenSceneWindow() => Application.isPlaying;
 
-        [MenuItem("SparkCore/Help", false, 30)]
+        [MenuItem("Spark Core/Help", false, 30)]
         public static void MenuHelp() => Application.OpenURL($"https://github.com/Spark-Studios/SparkCore#readme");
 
         #endregion
 
         private static void OpenMainWindow(int tabIndex)
         {
-            string windowTitle = "SparkCore";
+            string windowTitle = "Spark Core";
             if (window == null)
             {
                 window = GetWindow<SparkCoreWindow>(windowTitle, typeof(SceneView));
@@ -116,7 +117,7 @@ namespace SparkCore.Editor
             DrawBox(headerRect, new Color(0.1f, 0.1f, 0.1f));
             GUI.DrawTexture(iconRect, iconTexture);
             GUILayout.Space(5);
-            GUILayout.Label("SparkCore", headerStyle);
+            GUILayout.Label("Spark Core", headerStyle);
         }
 
         void DrawBox(Rect rect, Color color)
@@ -251,7 +252,11 @@ namespace SparkCore.Editor
                         Debug.Log($"Opening {path}");
                         try
                         {
-                            Process.Start($"{path}");
+                            // string cmd = "code";
+                            // string args = $"--goto \"{path}\":{3}";
+                            // Process.Start(cmd, args);
+                            
+                            Process.Start($"\"{path}\"");
                         }
                         catch (Exception e)
                         {
