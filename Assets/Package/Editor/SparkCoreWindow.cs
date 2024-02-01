@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SparkCore.Runtime.Core;
+using SparkCore.Runtime.Core.Events;
 using SparkCore.Runtime.Injection;
 using UnityEditor;
 using UnityEngine;

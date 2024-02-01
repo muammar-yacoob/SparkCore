@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace SparkCore.Runtime.Core
+namespace SparkCore.Runtime.Core.Events
 {
     /// <summary>
     ///  Handles event subscriptions and publishing.
@@ -68,6 +69,17 @@ namespace SparkCore.Runtime.Core
                     }
                 }
             }
+        }
+        
+        /// <summary>
+        /// Gets the list of subscribers for a specific event type.
+        /// </summary>
+        /// <typeparam name="T">Event type.</typeparam>
+        /// <returns>List of subscribers for the event.</returns>
+        public List<Delegate> GetSubscribers<T>()
+        {
+            Type type = typeof(T);
+            return eventDictionary.TryGetValue(type, out var subscribers) ? subscribers.ToList() : new List<Delegate>();
         }
     }
 }
