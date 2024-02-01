@@ -16,6 +16,9 @@ namespace SparkCore.Editor
     {
         private Vector2 scrollPos;
         private bool showFields;
+        private bool showProps;
+        private bool showMethods;
+        
         private GUIStyle headerStyle;
         private GUISkin skin;
         private static Texture2D iconTexture;
@@ -28,6 +31,9 @@ namespace SparkCore.Editor
         private GUIStyle labelStyle;
 
         private static List<FieldDescriptor> injectedFieldsList = new();
+        private static List<PropertyDescriptor> injectedPropertiesList = new();
+        private static List<MethodDescriptor> injectedMethodsList = new();
+        
         private static List<SceneEventDescriptor> sceneEventsList = new();
 
         private static SparkCoreWindow window;
@@ -40,6 +46,7 @@ namespace SparkCore.Editor
         private bool showEvents;
         private List<Delegate> sceneEvents;
         private bool showFullEventName;
+        private static Assembly defaultAssembly;
 
         #region Menus
 
@@ -62,6 +69,7 @@ namespace SparkCore.Editor
 
         private static void OpenMainWindow(int tabIndex)
         {
+            defaultAssembly = GetDefualtAssembly();
             string windowTitle = "Spark Core";
             if (window == null)
             {
@@ -82,6 +90,7 @@ namespace SparkCore.Editor
 
         private void OnEnable()
         {
+            
             LoadTextures();
             Repaint();
         }
@@ -200,6 +209,10 @@ namespace SparkCore.Editor
             {
                 LoadFields();
                 DrawFields();
+                
+                LoadProperties();
+                DrawProperties();
+                
                 Repaint();
             }
 
@@ -223,6 +236,8 @@ namespace SparkCore.Editor
             //DrawBox(hoverLayer,new Color(0,0,0,0.3f));
         }
 
+        #region Injections
+        #region Fields
         private void DrawFields()
         {
             GUILayout.Space(20);
@@ -271,12 +286,9 @@ namespace SparkCore.Editor
 
             EditorGUILayout.EndFoldoutHeaderGroup();
         }
-
-
         private void LoadFields()
         {
-            var ass = GetDefualtAssembly();
-            IEnumerable<Type> types = ass.GetTypes();
+            IEnumerable<Type> types = defaultAssembly.GetTypes();
             var myTypes =  types.Where(type => type.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
 
@@ -303,6 +315,90 @@ namespace SparkCore.Editor
                 }
             }
         }
+        #endregion
+
+        #region Poperties
+
+        private void DrawProperties()
+        {
+            GUILayout.Space(20);
+            showProps =
+                EditorGUILayout.BeginFoldoutHeaderGroup(showProps, $"{(showProps ? "-" : "+")} Properties", h1Style);
+            if (showProps)
+            {
+                if (injectedPropertiesList.Count < 1) LoadProperties();
+
+                var maxSectionHeight = Mathf.Min(injectedPropertiesList.Count * 30, Screen.height / 3);
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true),
+                    GUILayout.Height(maxSectionHeight));
+                foreach (var item in injectedPropertiesList)
+                {
+                    GUILayout.BeginHorizontal();
+
+                    GUILayout.Space(10);
+                    GUILayout.Label($"{(showTypes ? item.Type.Name : "")} {item.Name} ➜", labelStyle);
+
+                    GUILayout.Space(10);
+                    string caption = $"{item.ParentType.Name}";
+                    if (GUILayout.Button(caption, linkStyle))
+                    {
+                        var path = Application.dataPath + "/" + item.FileName;
+                        path = path.Replace("Assets/Assets/", "Assets/");
+                        Debug.Log($"Opening {path}");
+                        try
+                        {
+                            // string cmd = "code";
+                            // string args = $"--goto \"{path}\":{3}";
+                            // Process.Start(cmd, args);
+                            
+                            Process.Start($"\"{path}\"");
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogWarning($"Failed to open {path}. Error: {e.Message}");
+                        }
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.EndScrollView();
+            }
+
+            EditorGUILayout.EndFoldoutHeaderGroup();
+        }
+
+        private void LoadProperties()
+        {
+            IEnumerable<Type> types = defaultAssembly.GetTypes();
+            var myTypes =  types.Where(type => type.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+            var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
+
+            injectedPropertiesList.Clear();
+            
+            foreach (Type type in myTypes)
+            {
+                foreach (PropertyInfo property in type.GetProperties(flags))
+                {
+                    if (property.GetCustomAttribute<Inject>() != null)
+                    {
+                        // if (property.PropertyType.IsAssignableFrom(typeof(ISceneEventHistory)) ||
+                        //     property.PropertyType.IsAssignableFrom(typeof(ISceneEventProvider)))
+                        //     continue;
+
+                        var results = AssetDatabase.FindAssets((type.Name));
+                        var g = results.FirstOrDefault();
+                        var filePath = AssetDatabase.GUIDToAssetPath(g);
+                        var prop = new PropertyDescriptor(property.Name, property.PropertyType, filePath, type);
+                        injectedPropertiesList.Add(prop);
+                        //Debug.Log(prop.Name);
+                    }
+                }
+            }
+        }
+
+        #endregion
+        #endregion
 
         public void LoadSceneEvents()
         {
@@ -415,6 +511,38 @@ namespace SparkCore.Editor
         public string FileName;
 
         public FieldDescriptor(string name, Type type, string fileName, Type parentType)
+        {
+            Name = name;
+            Type = type;
+            ParentType = parentType;
+            FileName = fileName;
+        }
+    }
+    
+    public class PropertyDescriptor
+    {
+        public string Name;
+        public Type Type;
+        public Type ParentType;
+        public string FileName;
+
+        public PropertyDescriptor(string name, Type type, string fileName, Type parentType)
+        {
+            Name = name;
+            Type = type;
+            ParentType = parentType;
+            FileName = fileName;
+        }
+    }
+    
+    public class MethodDescriptor
+    {
+        public string Name;
+        public Type Type;
+        public Type ParentType;
+        public string FileName;
+
+        public MethodDescriptor(string name, Type type, string fileName, Type parentType)
         {
             Name = name;
             Type = type;
