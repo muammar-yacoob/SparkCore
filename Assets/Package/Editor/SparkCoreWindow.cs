@@ -16,7 +16,7 @@ namespace SparkCore.Editor
     {
         private Vector2 scrollPos;
         private bool showFields;
-        private bool showProps;
+        private bool showProps = true;
         private bool showMethods;
         
         private GUIStyle headerStyle;
@@ -197,7 +197,7 @@ namespace SparkCore.Editor
         private void DrawInjectionTab()
         {
             DrawFields();
-            GUILayout.Space(10);
+            DrawProperties();
 
             if (EditorApplication.isPlaying)
             {
@@ -241,8 +241,7 @@ namespace SparkCore.Editor
         private void DrawFields()
         {
             GUILayout.Space(20);
-            showFields =
-                EditorGUILayout.BeginFoldoutHeaderGroup(showFields, $"{(showFields ? "-" : "+")} Fields", h1Style);
+            showFields = EditorGUILayout.BeginFoldoutHeaderGroup(showFields, $"{(showFields ? "-" : "+")} Fields", h1Style);
             if (showFields)
             {
                 if (injectedFieldsList.Count < 1) LoadFields();
@@ -322,8 +321,8 @@ namespace SparkCore.Editor
         private void DrawProperties()
         {
             GUILayout.Space(20);
-            showProps =
-                EditorGUILayout.BeginFoldoutHeaderGroup(showProps, $"{(showProps ? "-" : "+")} Properties", h1Style);
+
+            showProps = EditorGUILayout.BeginFoldoutHeaderGroup(showProps, $"{(showProps ? "-" : "+")} Properties", h1Style);
             if (showProps)
             {
                 if (injectedPropertiesList.Count < 1) LoadProperties();
@@ -391,7 +390,7 @@ namespace SparkCore.Editor
                         var filePath = AssetDatabase.GUIDToAssetPath(g);
                         var prop = new PropertyDescriptor(property.Name, property.PropertyType, filePath, type);
                         injectedPropertiesList.Add(prop);
-                        Debug.Log(prop.Name);
+                        // Debug.Log(prop.Name);
                     }
                 }
             }
