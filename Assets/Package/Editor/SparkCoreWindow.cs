@@ -69,7 +69,7 @@ namespace SparkCore.Editor
 
         private static void OpenMainWindow(int tabIndex)
         {
-            defaultAssembly = GetDefualtAssembly();
+            
             string windowTitle = "Spark Core";
             if (window == null)
             {
@@ -90,7 +90,7 @@ namespace SparkCore.Editor
 
         private void OnEnable()
         {
-            
+            defaultAssembly = GetDefualtAssembly();
             LoadTextures();
             Repaint();
         }
@@ -208,9 +208,9 @@ namespace SparkCore.Editor
             if (GUILayout.Button("Rescan Assembly"))
             {
                 LoadFields();
-                DrawFields();
-                
                 LoadProperties();
+                
+                DrawFields();
                 DrawProperties();
                 
                 Repaint();
@@ -391,7 +391,7 @@ namespace SparkCore.Editor
                         var filePath = AssetDatabase.GUIDToAssetPath(g);
                         var prop = new PropertyDescriptor(property.Name, property.PropertyType, filePath, type);
                         injectedPropertiesList.Add(prop);
-                        //Debug.Log(prop.Name);
+                        Debug.Log(prop.Name);
                     }
                 }
             }
