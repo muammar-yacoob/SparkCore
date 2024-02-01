@@ -8,8 +8,8 @@ namespace SparkDev.Demo.InjectionTest
     public class InjectionTest : InjectableMonoBehaviour
     {
         //Injects the first registered service of type ILogger
-        [Inject] private ILogger _logger ;
-        [Inject] private ILogger logger { get; set; }
+        [Inject] private ILogger loggerField ;
+        [Inject] private ILogger loggerProp { get; set; }
 
 
         // [Inject(typeof(ConsoleLogger))] private ILogger logger; //Registered as Singleton, will inject the same instance of ConsoleLogger
@@ -21,16 +21,17 @@ namespace SparkDev.Demo.InjectionTest
             Debug.Log($"Press space bar to switch scenes.");
         }
 
-        [Inject]//Called first upon service registration
-        private void SetupLogger(ILogger logger)
+        // [Inject]
+        [Inject(typeof(AnotherLogger))]
+        private void SetupLogger(ILogger loggerParam)
         {
-            logger.Log($"Hello Method Injection!");
+            loggerParam.Log($"Hello Method Injection!");
         }
 
         private void OnEnable()
         {
-            _logger.Log($"Hello field Injection!");
-            logger.Log($"Hello property Injection!");
+            loggerField.Log($"Hello field Injection!");
+            loggerProp.Log($"Hello property Injection!");
         }
 
         private void Update()

@@ -58,25 +58,18 @@ namespace SparkCore.Runtime.Core
 
         private static void InjectMethods(object injectableMonoBehaviour, Container container)
         {
-            var methods = injectableMonoBehaviour.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+            var methods = injectableMonoBehaviour.GetType()
+                .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(m => m.IsDefined(typeof(Inject), true));
 
             foreach (var method in methods)
             {
-                var parameters = method.GetParameters();
-                var parameterInstances = new object[parameters.Length];
-
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    var parameterType = parameters[i].ParameterType;
-                    parameterInstances[i] = container.Resolve(parameterType);
-                }
-
-                method.Invoke(injectableMonoBehaviour, parameterInstances);
+                var injectAttribute = method.GetCustomAttribute<Inject>();
+                var typeToInject = injectAttribute?.ImplementationType ?? method.GetParameters().First().ParameterType;
+                var resolvedInstance = container.Resolve(typeToInject);
+                method.Invoke(injectableMonoBehaviour, new[] {resolvedInstance});
             }
         }
-
-
         #endregion
 
         #region Event Subscriptions
