@@ -5,32 +5,30 @@ namespace SparkCore.Runtime.Injection
     /// <summary>
     /// Used to determine how the object should be instantiated.
     /// </summary>
-    public enum RuntimeObjectType
+    public enum ServiceLifetime
     {
         Singleton,
         Transient
     }
 
-
     /// <summary>
     /// Used to mark a class as a runtime object.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class RuntimeObject : Attribute
+    public class ServiceProvider : Attribute
     {
         /// <summary>
         /// Determines how the object should be instantiated.
         /// </summary>
-        public RuntimeObjectType RuntimeObjectType { get; }
+        public ServiceLifetime ServiceLifetime { get; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="RuntimeObject"/> attribute.
+        /// Creates a new instance of the <see cref="ServiceProvider"/> attribute.
         /// </summary>
-        /// <param name="runtimeObjectType"></param>
-        public RuntimeObject(RuntimeObjectType runtimeObjectType = RuntimeObjectType.Singleton)
+        /// <param name="serviceLifetime"></param>
+        public ServiceProvider(ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         {
-            RuntimeObjectType = runtimeObjectType;
+            ServiceLifetime = serviceLifetime;
         }
     }
-
 }
