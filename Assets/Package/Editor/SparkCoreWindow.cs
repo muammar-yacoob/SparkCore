@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SparkCore.Runtime.Core;
+using SparkCore.Runtime.Injection;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -286,7 +287,7 @@ namespace SparkCore.Editor
             {
                 foreach (FieldInfo field in type.GetFields(flags))
                 {
-                    if (field.GetCustomAttribute<InjectAttribute>() != null)
+                    if (field.GetCustomAttribute<Inject>() != null)
                     {
                         // if (field.FieldType.IsAssignableFrom(typeof(ISceneEventHistory)) ||
                         //     field.FieldType.IsAssignableFrom(typeof(ISceneEventProvider)))
