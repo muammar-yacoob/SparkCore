@@ -510,21 +510,18 @@ namespace SparkCore.Editor
                 foreach (var item in sceneEventsList)
                 {
                     GUILayout.BeginHorizontal();
-
                     GUILayout.Space(10);
-
 
                     string eventSubscriberNamespace = item.SceneEvent.Method.DeclaringType.Namespace;
                     string eventSubscriberClass = item.SceneEvent.Method.DeclaringType.Name;
                     string eventSubscriberHandler = item.SceneEvent.Method.Name;
                     string eventSubscriberType = item.EventType.Name;
 
-
-                    GUILayout.Label($"{(showFullEventName ? $"{eventSubscriberNamespace}." : "")}" +
-                                      $"{eventSubscriberClass}{(showFullEventName ? $".{eventSubscriberHandler}" : "")} ➜", labelStyle);
+                    string caption = ($"{(showFullEventName ? $"{eventSubscriberNamespace}." : "")}" +
+                                      $"{eventSubscriberClass}{(showFullEventName ? $".{eventSubscriberHandler}" : "")}");
 
                     GUILayout.Space(10);
-                    string caption = $"{eventSubscriberType}";
+                    GUILayout.Label($"{eventSubscriberType} \u279c ", labelStyle);
 
                     var results = AssetDatabase.FindAssets((eventSubscriberClass));
                     var g = results.FirstOrDefault();
