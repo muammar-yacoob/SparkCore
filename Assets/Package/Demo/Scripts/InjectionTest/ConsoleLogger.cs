@@ -10,7 +10,7 @@ namespace SparkDev.Demo.InjectionTest
         private readonly Guid guid;
         public ConsoleLogger() => this.guid = Guid.NewGuid();
 
-        public void Log(string message) => Debug.Log($"<color=green>ConsoleLogger: {guid}</color> {message}");
+        public void Log(string message) => Debug.Log($"<color=yellow>ConsoleLogger: {guid}</color> {message}");
     }
     
     [ServiceProvider(ServiceLifetime.Transient)]

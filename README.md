@@ -88,6 +88,9 @@ When your project has multiple implementations of an `IService` per say, it's be
 [Inject(typeof(ConcreteService))] private IService service;
 ```
 
+#### Singleton vs Transient Services
+Notice how services registered as singletons will maintain the same guid between different service users and scenes.
+<img src="./res/imgs/SingletonService.png" alt="Singleton vs Transient Services">
 
 #### Injection Sequence Diagram
 ```mermaid
