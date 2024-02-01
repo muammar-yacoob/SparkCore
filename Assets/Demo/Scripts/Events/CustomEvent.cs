@@ -1,6 +1,8 @@
-﻿namespace SparkCoreDev.Demo.Scripts.Events
+﻿using SparkCore.Runtime.Core;
+
+namespace SparkCoreDev.Demo.Scripts.Events
 {
-    public class CustomEvent
+    public class CustomEvent : SceneEvent
     {
         public readonly string Message;
 

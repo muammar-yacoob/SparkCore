@@ -183,6 +183,7 @@ namespace SparkCore.Editor
                 return;
             }
 
+            
             DrawSceneEvents();
             if (GUILayout.Button("Load Scene Events"))
             {
@@ -482,62 +483,45 @@ namespace SparkCore.Editor
         #endregion
         #endregion
 
-        public void LoadSceneEvents()
+        private void LoadSceneEvents()
         {
-                sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
-            foreach (var sceneEvent in sceneEvents)
-            {
-                Debug.Log(sceneEvent.Method.DeclaringType.Name);
-            }
             sceneEventsList.Clear();
+            var sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
             foreach (var sceneEvent in sceneEvents)
             {
-                foreach (Action<SceneEvent> handler in sceneEvent.GetInvocationList())
-                {
-                    Type eventName = sceneEvent.Method.DeclaringType;
-                    string eventSubscriberNamespace = handler.Target.GetType().Namespace;
-                    string eventSubscriberClass = handler.Target.GetType().Name;
-                    string eventSubscriberHandler = handler.Method.Name;
-
-                    //Debug.Log($"{eventName}: {eventSubscriberNamespace}.{eventSubscriberClass}.{eventSubscriberHandler}");
-
-                    var eventDesc = new SceneEventDescriptor(sceneEvent, handler);
-                    sceneEventsList.Add(eventDesc);
-                }
+                sceneEventsList.Add(new SceneEventDescriptor(sceneEvent, sceneEvent.Method.GetParameters()[0].ParameterType));
             }
         }
-
+        
         private void DrawSceneEvents()
         {
             GUILayout.Space(5);
             showEvents =
                 EditorGUILayout.BeginFoldoutHeaderGroup(showEvents, $"{(showEvents ? "-" : "+")} Events", h1Style);
+            
             if (showEvents)
             {
-                if (sceneEvents == null) return;
-                if (sceneEvents.Count < 1) LoadSceneEvents();
+                if (sceneEventsList == null) return;
+                if (sceneEventsList.Count < 1) LoadSceneEvents();
 
-                var maxSectionHeight = Mathf.Min(sceneEvents.Count * 30, Screen.height / 1.1f);
+                var maxSectionHeight = Mathf.Min(sceneEventsList.Count * 30, Screen.height / 1.1f);
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true),
                     GUILayout.Height(maxSectionHeight));
                 foreach (var item in sceneEventsList)
                 {
                     GUILayout.BeginHorizontal();
-
                     GUILayout.Space(10);
 
+                    string eventSubscriberNamespace = item.SceneEvent.Method.DeclaringType.Namespace;
+                    string eventSubscriberClass = item.SceneEvent.Method.DeclaringType.Name;
+                    string eventSubscriberHandler = item.SceneEvent.Method.Name;
+                    string eventSubscriberType = item.EventType.Name;
 
-                    string eventName = item.SceneEvent.Method.DeclaringType.Name;
-                    string eventSubscriberNamespace = item.Handler.Target.GetType().Namespace;
-                    string eventSubscriberClass = item.Handler.Target.GetType().Name;
-                    string eventSubscriberHandler = item.Handler.Method.Name;
-
-                    GUILayout.Label($"{(showFullEventName ? $"{eventSubscriberNamespace}." : "")}" +
-                                    $"{eventSubscriberClass}{(showFullEventName ? $".{eventSubscriberHandler}" : "")} ➜",
-                        labelStyle);
+                    string caption = ($"{(showFullEventName ? $"{eventSubscriberNamespace}." : "")}" +
+                                      $"{eventSubscriberClass}{(showFullEventName ? $".{eventSubscriberHandler}" : "")}");
 
                     GUILayout.Space(10);
-                    string caption = $"{eventName}";
+                    GUILayout.Label($"{eventSubscriberType} \u279c ", labelStyle);
 
                     var results = AssetDatabase.FindAssets((eventSubscriberClass));
                     var g = results.FirstOrDefault();
@@ -635,14 +619,14 @@ namespace SparkCore.Editor
 
     public class SceneEventDescriptor
     {
-        public Delegate SceneEvent;
-        public Action<SceneEvent> Handler;
+        public Delegate SceneEvent { get; private set; }
+        public Type EventType { get; private set; }
 
-        public SceneEventDescriptor(Delegate sceneEvent,
-            Action<SceneEvent> handler)
+        public SceneEventDescriptor(Delegate sceneEvent, Type eventType)
         {
             SceneEvent = sceneEvent;
-            Handler = handler;
+            EventType = eventType;
         }
     }
+
 }
