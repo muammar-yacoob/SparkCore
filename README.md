@@ -29,31 +29,57 @@ https://github.com/muammar-yacoob/SparkCore.git?path=Assets/Package
 ### Dependency Injection
 As Unity's MonoBehaviours do not expose constructors; Types deriving from `InjectableMonoBehaviour` can have their dependencies injected using the `[Inject]` annotation.
 
-For services to be injectable, they need to be decorated using the `[RuntimeObject]` you can explicitly register the service to be transient using the runtime type parameter as such `[RuntimeObject(RuntimeObjectType.Transient)]` otherwise, it will default to [RuntimeObject(RuntimeObjectType.Singleton)]
+For services to be injectable, they need to be decorated using the `[ServiceProvider]` you can explicitly register the service to be transient using the runtime type parameter as such `[ServiceProvider(ServiceLifetime.Transient)]` otherwise, it will default to [ServiceProvider(ServiceLifetime.Singleton)]
 
 example:
 ```csharp
     public class InjectionTest : InjectableMonoBehaviour
     {
-        [Inject(typeof(ConsoleLogger))] private ILogger logger;
-
+        [Inject] private ILogger logger;
+        
         private void OnEnable()
         {
             logger.Log("Hello Injection!");
         }
     }
 
-    [RuntimeObject]
+    [ServiceProvider]
     public class ConsoleLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"ConsoleLogger: {message}");
     }
     
-    [RuntimeObject]
+    [ServiceProvider]
     public class AnotherLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"AnotherLogger: {message}");
     }
+```
+
+More examples:
+```csharp
+    public class InjectionTest : InjectableMonoBehaviour
+    {
+        //Injects the first registered service of type ILogger
+        [Inject] private ILogger _logger ;
+        [Inject] private ILogger logger { get; set; }
+
+
+        //Registered as Singleton, will inject the same instance of ConsoleLogger
+        [Inject(typeof(ConsoleLogger))] private ILogger logger;
+        //Registered as Transient, will inject a new instance of AnotherLogger
+        [Inject(typeof(AnotherLogger))] private ILogger logger;
+
+        [Inject] private void SetupLogger(ILogger logger)
+        {
+            logger.Log($"Hello Method Injection!");
+        }
+
+        private void OnEnable()
+        {
+            _logger.Log($"Hello field Injection!");
+            logger.Log($"Hello property Injection!");
+        }
 ```
 > **Important Note:**
 When your project has multiple implementations of an `IService` per say, it's best to explicitly specify the concrete implementation type by providing the type in the `[Inject]` attribute, as demonstrated in the `InjectionTest` example above. Omitting the type parameter will result in the latest registered concrete implementation being resolved during injection. 

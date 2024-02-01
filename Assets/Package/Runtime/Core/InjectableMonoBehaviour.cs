@@ -63,12 +63,19 @@ namespace SparkCore.Runtime.Core
 
             foreach (var method in methods)
             {
-                var injectAttribute = method.GetCustomAttribute<Inject>();
-                var typeToInject = injectAttribute?.ImplementationType ?? method.ReturnType;
-                var resolvedInstance = container.Resolve(typeToInject);
-                method.Invoke(injectableMonoBehaviour, new[] { resolvedInstance });
+                var parameters = method.GetParameters();
+                var parameterInstances = new object[parameters.Length];
+
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    var parameterType = parameters[i].ParameterType;
+                    parameterInstances[i] = container.Resolve(parameterType);
+                }
+
+                method.Invoke(injectableMonoBehaviour, parameterInstances);
             }
         }
+
 
         #endregion
 

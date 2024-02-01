@@ -7,7 +7,7 @@ namespace SparkCore.Runtime.Injection
     /// <summary>
     /// Attribute to mark a field or property to be injected.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
     public class Inject : InjectAttribute
     {
         /// <summary>
