@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace SparkDev.Demo.InjectionTest
 {
-    [RuntimeObject(RuntimeObjectType.Singleton)]
+    [ServiceProvider(ServiceLifetime.Singleton)]
     public class ConsoleLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"ConsoleLogger: {message}");
     }
     
-    [RuntimeObject(RuntimeObjectType.Singleton)]
+    [ServiceProvider(ServiceLifetime.Singleton)]
     public class AnotherLogger : ILogger
     {
         public void Log(string message) => Debug.Log($"AnotherLogger: {message}");
