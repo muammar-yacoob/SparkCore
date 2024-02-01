@@ -198,6 +198,7 @@ namespace SparkCore.Editor
         {
             DrawFields();
             DrawProperties();
+            DrawMethods();
 
             if (EditorApplication.isPlaying)
             {
@@ -209,9 +210,11 @@ namespace SparkCore.Editor
             {
                 LoadFields();
                 LoadProperties();
+                LoadMethods();
                 
                 DrawFields();
                 DrawProperties();
+                DrawMethods();
                 
                 Repaint();
             }
@@ -396,6 +399,86 @@ namespace SparkCore.Editor
             }
         }
 
+        #endregion
+        
+        #region Methods
+        private void DrawMethods()
+        {
+            GUILayout.Space(20);
+
+            showMethods = EditorGUILayout.BeginFoldoutHeaderGroup(showMethods, $"{(showMethods ? "-" : "+")} Methods", h1Style);
+            if (showMethods)
+            {
+                if (injectedMethodsList.Count < 1) LoadMethods();
+
+                var maxSectionHeight = Mathf.Min(injectedMethodsList.Count * 30, Screen.height / 3);
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true),
+                    GUILayout.Height(maxSectionHeight));
+                foreach (var item in injectedMethodsList)
+                {
+                    GUILayout.BeginHorizontal();
+
+                    GUILayout.Space(10);
+                    GUILayout.Label($"{(showTypes ? item.Type.Name : "")} {item.Name} ➜", labelStyle);
+
+                    GUILayout.Space(10);
+                    string caption = $"{item.ParentType.Name}";
+                    if (GUILayout.Button(caption, linkStyle))
+                    {
+                        var path = Application.dataPath + "/" + item.FileName;
+                        path = path.Replace("Assets/Assets/", "Assets/");
+                        Debug.Log($"Opening {path}");
+                        try
+                        {
+                            // string cmd = "code";
+                            // string args = $"--goto \"{path}\":{3}";
+                            // Process.Start(cmd, args);
+                            
+                            Process.Start($"\"{path}\"");
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogWarning($"Failed to open {path}. Error: {e.Message}");
+                        }
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.EndScrollView();
+            }
+
+            EditorGUILayout.EndFoldoutHeaderGroup();
+        }
+        
+        private void LoadMethods()
+        {
+            IEnumerable<Type> types = defaultAssembly.GetTypes();
+            var myTypes =  types.Where(type => type.IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
+            var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
+
+            injectedMethodsList.Clear();
+            
+            foreach (Type type in myTypes)
+            {
+                foreach (MethodInfo method in type.GetMethods(flags))
+                {
+                    if (method.GetCustomAttribute<Inject>() != null)
+                    {
+                        // if (method.ReturnType.IsAssignableFrom(typeof(ISceneEventHistory)) ||
+                        //     method.ReturnType.IsAssignableFrom(typeof(ISceneEventProvider)))
+                        //     continue;
+
+                        var results = AssetDatabase.FindAssets((type.Name));
+                        var g = results.FirstOrDefault();
+                        var filePath = AssetDatabase.GUIDToAssetPath(g);
+                        var mthd = new MethodDescriptor(method.Name, method.ReturnType, filePath, type);
+                        injectedMethodsList.Add(mthd);
+                        // Debug.Log(mthd.Name);
+                    }
+                }
+            }
+        }
         #endregion
         #endregion
 
