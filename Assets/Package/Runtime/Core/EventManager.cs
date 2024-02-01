@@ -78,6 +78,25 @@ namespace SparkCore.Runtime.Core
         /// <returns>List of subscribers for the event.</returns>
         public List<Delegate> GetSubscribers<T>()
         {
+            Type baseType = typeof(SceneEvent);
+            var allSubscribers = new List<Delegate>();
+
+            foreach (var entry in eventDictionary)
+            {
+                // Check if the key is a subclass of SceneEvent
+                if (baseType.IsAssignableFrom(entry.Key))
+                {
+                    allSubscribers.AddRange(entry.Value);
+                }
+            }
+            return allSubscribers;
+        }
+        
+        /// <summary>
+        /// Returns the list of subscribers for a specific event type.
+        /// </summary>
+        public List<Delegate> GetCustomSubscribers<T>()
+        {
             Type type = typeof(T);
             return eventDictionary.TryGetValue(type, out var subscribers) ? subscribers.ToList() : new List<Delegate>();
         }

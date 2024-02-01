@@ -485,26 +485,14 @@ namespace SparkCore.Editor
 
         private void LoadSceneEvents()
         {
-            sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
-            foreach (var sceneEvent in sceneEvents)
-            {
-                Debug.Log(sceneEvent.Method.DeclaringType?.Name);
-                Debug.Log(sceneEvent.Method.Name);
-                Debug.Log(sceneEvent.Target.GetType().Name);
-            }
             sceneEventsList.Clear();
+            var sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
             foreach (var sceneEvent in sceneEvents)
             {
-                foreach (Action<SceneEvent> handler in sceneEvent.GetInvocationList())
-                {
-                    //Debug.Log($"{eventName}: {eventSubscriberNamespace}.{eventSubscriberClass}.{eventSubscriberHandler}");
-
-                    var eventDesc = new SceneEventDescriptor(sceneEvent, handler);
-                    sceneEventsList.Add(eventDesc);
-                }
+                sceneEventsList.Add(new SceneEventDescriptor(sceneEvent, sceneEvent.Method.GetParameters()[0].ParameterType));
             }
         }
-
+        
         private void DrawSceneEvents()
         {
             GUILayout.Space(5);
@@ -513,10 +501,10 @@ namespace SparkCore.Editor
             
             if (showEvents)
             {
-                if (sceneEvents == null) return;
-                if (sceneEvents.Count < 1) LoadSceneEvents();
+                if (sceneEventsList == null) return;
+                if (sceneEventsList.Count < 1) LoadSceneEvents();
 
-                var maxSectionHeight = Mathf.Min(sceneEvents.Count * 30, Screen.height / 1.1f);
+                var maxSectionHeight = Mathf.Min(sceneEventsList.Count * 30, Screen.height / 1.1f);
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true),
                     GUILayout.Height(maxSectionHeight));
                 foreach (var item in sceneEventsList)
@@ -526,17 +514,17 @@ namespace SparkCore.Editor
                     GUILayout.Space(10);
 
 
-                    string eventName = item.SceneEvent.Method.DeclaringType.Name;
-                    string eventSubscriberNamespace = item.Handler.Target.GetType().Namespace;
-                    string eventSubscriberClass = item.Handler.Target.GetType().Name;
-                    string eventSubscriberHandler = item.Handler.Method.Name;
+                    string eventSubscriberNamespace = item.SceneEvent.Method.DeclaringType.Namespace;
+                    string eventSubscriberClass = item.SceneEvent.Method.DeclaringType.Name;
+                    string eventSubscriberHandler = item.SceneEvent.Method.Name;
+                    string eventSubscriberType = item.EventType.Name;
+
 
                     GUILayout.Label($"{(showFullEventName ? $"{eventSubscriberNamespace}." : "")}" +
-                                    $"{eventSubscriberClass}{(showFullEventName ? $".{eventSubscriberHandler}" : "")} ➜",
-                        labelStyle);
+                                      $"{eventSubscriberClass}{(showFullEventName ? $".{eventSubscriberHandler}" : "")} ➜", labelStyle);
 
                     GUILayout.Space(10);
-                    string caption = $"{eventName}";
+                    string caption = $"{eventSubscriberType}";
 
                     var results = AssetDatabase.FindAssets((eventSubscriberClass));
                     var g = results.FirstOrDefault();
@@ -634,13 +622,14 @@ namespace SparkCore.Editor
 
     public class SceneEventDescriptor
     {
-        public Delegate SceneEvent;
-        public Action<SceneEvent> Handler;
+        public Delegate SceneEvent { get; private set; }
+        public Type EventType { get; private set; }
 
-        public SceneEventDescriptor(Delegate sceneEvent, Action<SceneEvent> handler)
+        public SceneEventDescriptor(Delegate sceneEvent, Type eventType)
         {
             SceneEvent = sceneEvent;
-            Handler = handler;
+            EventType = eventType;
         }
     }
+
 }
