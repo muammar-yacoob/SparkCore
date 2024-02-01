@@ -1,5 +1,4 @@
-﻿using VContainer;
-
+﻿
 namespace SparkCore.Runtime.Injection
 {
     using System;
@@ -8,7 +7,7 @@ namespace SparkCore.Runtime.Injection
     /// Attribute to mark a field or property to be injected.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
-    public class Inject : InjectAttribute
+    public class Inject : Attribute
     {
         /// <summary>
         /// The type of the implementation to be injected.
