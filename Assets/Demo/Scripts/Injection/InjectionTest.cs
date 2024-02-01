@@ -3,7 +3,7 @@ using SparkCore.Runtime.Injection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace SparkDev.Demo.InjectionTest
+namespace SparkCoreDev.Demo.Scripts.Injection
 {
     public class InjectionTest : InjectableMonoBehaviour
     {

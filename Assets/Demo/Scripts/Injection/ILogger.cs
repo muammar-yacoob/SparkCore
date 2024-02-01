@@ -1,4 +1,4 @@
-﻿namespace SparkDev.Demo.InjectionTest
+﻿namespace SparkCoreDev.Demo.Scripts.Injection
 {
     public interface ILogger
     {
