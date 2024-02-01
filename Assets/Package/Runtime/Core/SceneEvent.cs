@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SparkCore.Runtime.Core.Events
+namespace SparkCore.Runtime.Core
 {
     public class SceneEvent
     {

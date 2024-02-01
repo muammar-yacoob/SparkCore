@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SparkCore.Runtime.Core.Events;
 using SparkCore.Runtime.Injection;
 using UnityEngine;
 

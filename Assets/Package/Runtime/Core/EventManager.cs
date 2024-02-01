@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SparkCore.Runtime.Core.Events
+namespace SparkCore.Runtime.Core
 {
     /// <summary>
     ///  Handles event subscriptions and publishing.
