@@ -183,6 +183,7 @@ namespace SparkCore.Editor
                 return;
             }
 
+            
             DrawSceneEvents();
             if (GUILayout.Button("Load Scene Events"))
             {
@@ -482,23 +483,20 @@ namespace SparkCore.Editor
         #endregion
         #endregion
 
-        public void LoadSceneEvents()
+        private void LoadSceneEvents()
         {
-                sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
+            sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
             foreach (var sceneEvent in sceneEvents)
             {
-                Debug.Log(sceneEvent.Method.DeclaringType.Name);
+                Debug.Log(sceneEvent.Method.DeclaringType?.Name);
+                Debug.Log(sceneEvent.Method.Name);
+                Debug.Log(sceneEvent.Target.GetType().Name);
             }
             sceneEventsList.Clear();
             foreach (var sceneEvent in sceneEvents)
             {
                 foreach (Action<SceneEvent> handler in sceneEvent.GetInvocationList())
                 {
-                    Type eventName = sceneEvent.Method.DeclaringType;
-                    string eventSubscriberNamespace = handler.Target.GetType().Namespace;
-                    string eventSubscriberClass = handler.Target.GetType().Name;
-                    string eventSubscriberHandler = handler.Method.Name;
-
                     //Debug.Log($"{eventName}: {eventSubscriberNamespace}.{eventSubscriberClass}.{eventSubscriberHandler}");
 
                     var eventDesc = new SceneEventDescriptor(sceneEvent, handler);
@@ -512,6 +510,7 @@ namespace SparkCore.Editor
             GUILayout.Space(5);
             showEvents =
                 EditorGUILayout.BeginFoldoutHeaderGroup(showEvents, $"{(showEvents ? "-" : "+")} Events", h1Style);
+            
             if (showEvents)
             {
                 if (sceneEvents == null) return;
@@ -638,8 +637,7 @@ namespace SparkCore.Editor
         public Delegate SceneEvent;
         public Action<SceneEvent> Handler;
 
-        public SceneEventDescriptor(Delegate sceneEvent,
-            Action<SceneEvent> handler)
+        public SceneEventDescriptor(Delegate sceneEvent, Action<SceneEvent> handler)
         {
             SceneEvent = sceneEvent;
             Handler = handler;
