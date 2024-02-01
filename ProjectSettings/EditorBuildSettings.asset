@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Package/Demo/Scenes/Demo.unity
+    path: Assets/Package/Demo/Scenes/Injection Demo 1.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/Package/Demo/Scenes/Debugger Demo.unity
-    guid: 9211ddb77e35db94f8bc79fa3db28cfb
+    path: Assets/Package/Demo/Scenes/Injection Demo 2.unity
+    guid: 933e6c95d5ac18f4194e56db3fe84599
   m_configObjects: {}
