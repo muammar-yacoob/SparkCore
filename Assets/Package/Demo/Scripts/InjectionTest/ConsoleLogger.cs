@@ -1,18 +1,24 @@
-﻿using SparkCore.Runtime.Injection;
+﻿using System;
+using SparkCore.Runtime.Injection;
 using UnityEngine;
 
 namespace SparkDev.Demo.InjectionTest
 {
-    [ServiceProvider(ServiceLifetime.Singleton)]
+    [ServiceProvider]
     public class ConsoleLogger : ILogger
     {
-        public void Log(string message) => Debug.Log($"ConsoleLogger: {message}");
+        private readonly Guid guid;
+        public ConsoleLogger() => this.guid = Guid.NewGuid();
+
+        public void Log(string message) => Debug.Log($"<color=green>ConsoleLogger: {guid}</color> {message}");
     }
     
-    [ServiceProvider(ServiceLifetime.Singleton)]
+    [ServiceProvider(ServiceLifetime.Transient)]
     public class AnotherLogger : ILogger
     {
-        public void Log(string message) => Debug.Log($"AnotherLogger: {message}");
+        private readonly Guid guid;
+        public AnotherLogger() => this.guid = Guid.NewGuid();
+        public void Log(string message) => Debug.Log($"<color=cyan>AnotherLogger: {guid}</color> {message}");
     }
 
 }

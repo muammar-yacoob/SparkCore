@@ -1,67 +1,137 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using SparkCore.Runtime.Utils;
 using UnityEngine;
-using VContainer;
-using VContainer.Unity;
 
 namespace SparkCore.Runtime.Injection
 {
     /// <summary>
-    /// Responsible for registering all types with the <see cref="RuntimeObject"/> attribute with VContainer.
+    /// Responsible for registering all types with the <see cref="ServiceProvider"/> attribute.
     /// </summary>
-    public class RuntimeInjector : LifetimeScope
+    [DefaultExecutionOrder(-1000)]
+    public class RuntimeInjector : Singleton<RuntimeInjector>
     {
-        public static RuntimeInjector Instance { get; private set; }
+        private static readonly Lazy<Container> _container = new(BuildContainer);
+        public static Container Container => _container.Value;
 
-        protected override void Awake()
+        private static Container BuildContainer()
         {
-            if (Instance != null)
-            {
-                Destroy(this);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(this);
-            base.Awake();
-        }
-
-
-        protected override void Configure(IContainerBuilder builder)
-        {
-            AutoRegister(builder);
-        }
-
-        private static void AutoRegister(IContainerBuilder builder)
-        {
+            var services = new List<ServiceDescriptor>();
             var scriptAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
+            // Find types with ServiceProvider attribute
             var injectableTypes = scriptAssemblies
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.GetCustomAttribute<RuntimeObject>() != null);
+                .Where(t => t.GetCustomAttribute<ServiceProvider>() != null)
+                .ToList();
 
-            // Register with VContainer
             foreach (var type in injectableTypes)
             {
-                var lifetime = type.GetCustomAttribute<RuntimeObject>().RuntimeObjectType;
+                var lifetime = type.GetCustomAttribute<ServiceProvider>()?.ServiceLifetime ?? ServiceLifetime.Transient;
 
-                builder.Register(type, MapToVContainerLifetime(lifetime))
-                    .AsImplementedInterfaces()
-                    .AsSelf();
-                Debug.Log($"{type.Name} registered with VContainer");
+                // Find interfaces implemented by the type
+                var serviceTypes = type.GetInterfaces();
+                foreach (var serviceType in serviceTypes)
+                {
+                    object implementationInstance = null;
+                    if (lifetime == ServiceLifetime.Singleton)
+                    {
+                        implementationInstance = Activator.CreateInstance(type);
+                    }
+
+                    services.Add(new ServiceDescriptor(serviceType, type, lifetime, implementationInstance));
+                    Debug.Log($"{serviceType.Name} -> {type.Name} registered as {lifetime}");
+                }
             }
-            Debug.Log(injectableTypes.Count() + " types registered with VContainer");
+
+            Debug.Log($"{injectableTypes.Count} types registered");
+            return new Container(services);
         }
-        
-        private static Lifetime MapToVContainerLifetime(RuntimeObjectType runtimeObjectType)
+    }
+
+    public class ServiceDescriptor
+    {
+        public Type ServiceType { get; }
+        public Type ImplementationType { get; private set; }
+        public object Implementation { get; internal set; }
+        public ServiceLifetime Lifetime { get; }
+
+        public ServiceDescriptor(Type serviceType, Type implementationType, ServiceLifetime lifetime,
+            object implementation = null)
         {
-            return runtimeObjectType switch
+            ServiceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
+            ImplementationType = implementationType ?? throw new ArgumentNullException(nameof(implementationType));
+            Lifetime = lifetime;
+            Implementation = implementation;
+        }
+    }
+
+
+    public class Container
+    {
+        private readonly List<ServiceDescriptor> _serviceDescriptors;
+
+        public Container(List<ServiceDescriptor> serviceDescriptors)
+        {
+            _serviceDescriptors = serviceDescriptors ?? throw new ArgumentNullException(nameof(serviceDescriptors));
+        }
+
+        public object Resolve(Type serviceType, Type implementationType = null)
+        {
+            ServiceDescriptor descriptor;
+            if (implementationType != null)
             {
-                RuntimeObjectType.Singleton => Lifetime.Singleton,
-                RuntimeObjectType.Transient => Lifetime.Transient,
-                _ => Lifetime.Singleton,
-            };
+                descriptor = _serviceDescriptors
+                    .FirstOrDefault(x => x.ImplementationType == implementationType);
+                if (descriptor == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Concrete implementation of type {implementationType.Name} is not registered.");
+                }
+            }
+            else
+            {
+                descriptor = _serviceDescriptors
+                    .FirstOrDefault(x => x.ServiceType == serviceType);
+                if (descriptor == null)
+                {
+                    // Fallback for concrete types not explicitly registered
+                    if (!serviceType.IsAbstract && !serviceType.IsInterface)
+                        return CreateInstance(serviceType);
+
+                    throw new InvalidOperationException($"Service of type {serviceType.Name} is not registered.");
+                }
+            }
+
+            if (descriptor.Lifetime == ServiceLifetime.Singleton && descriptor.Implementation != null)
+                return descriptor.Implementation;
+
+            var typeToCreate = implementationType ?? descriptor.ImplementationType ?? serviceType;
+            var implementation = CreateInstance(typeToCreate);
+
+            if (descriptor.Lifetime == ServiceLifetime.Singleton)
+                descriptor.Implementation = implementation;
+
+            return implementation;
+        }
+
+        public T Resolve<T>(Type implementationType = null)
+        {
+            return (T)Resolve(typeof(T), implementationType);
+        }
+
+        private object CreateInstance(Type type)
+        {
+            var constructorInfo = type.GetConstructors().FirstOrDefault();
+            if (constructorInfo == null)
+                throw new InvalidOperationException($"No public constructor found for {type.Name}.");
+
+            var parameters = constructorInfo.GetParameters()
+                .Select(x => Resolve(x.ParameterType)).ToArray();
+
+            return Activator.CreateInstance(type, parameters);
         }
     }
 }
