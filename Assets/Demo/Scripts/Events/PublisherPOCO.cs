@@ -1,6 +1,6 @@
 using SparkCore.Runtime.Core;
 
-namespace SparkDev.Demo.EventsTest
+namespace SparkCoreDev.Demo.Scripts.Events
 {
     public class PublisherPOCO
     {

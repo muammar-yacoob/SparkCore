@@ -2,7 +2,9 @@
     "name": "SparkCore.Editor",
     "rootNamespace": "SparkCore.Editor",
     "references": [
-        "GUID:29a97fdb28605cd4d991b4c80c33def2"
+        "GUID:29a97fdb28605cd4d991b4c80c33def2",
+        "GUID:7bce08a00b4d54cd694096abadbb897e",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc"
     ],
     "includePlatforms": [
         "Editor"
@@ -13,6 +15,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "Select...",
+            "expression": "",
+            "define": ""
+        }
+    ],
     "noEngineReferences": false
 }

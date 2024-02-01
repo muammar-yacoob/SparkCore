@@ -29,6 +29,6 @@ namespace SparkCore.Editor.Menus
         public static void FindMissingInProject() => PrefabsWithMissingScripts.FindInProject();
 
         [MenuItem("Spark Core/About", false, 1011)]
-        public static void MenuHelp() => Application.OpenURL($"https://github.com/Born-Studios/BornCore");
+        public static void MenuHelp() => Application.OpenURL($"https://github.com/muammar-yacoob/SparkCore");
     }
 }

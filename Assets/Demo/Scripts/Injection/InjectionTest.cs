@@ -3,13 +3,15 @@ using SparkCore.Runtime.Injection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace SparkDev.Demo.InjectionTest
+namespace SparkCoreDev.Demo.Scripts.Injection
 {
     public class InjectionTest : InjectableMonoBehaviour
     {
         //Injects the first registered service of type ILogger
         [Inject] private ILogger loggerField ;
+        [Inject(typeof(AnotherLogger))] private ILogger loggerField2 ;
         [Inject] private ILogger loggerProp { get; set; }
+        [Inject] private ILogger loggerProp2 { get; set; }
 
 
         // [Inject(typeof(ConsoleLogger))] private ILogger logger; //Registered as Singleton, will inject the same instance of ConsoleLogger

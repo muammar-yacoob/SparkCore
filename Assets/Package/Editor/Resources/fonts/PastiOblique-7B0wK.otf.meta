@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 862100de5eacbd144ab2cf0cf65f3341
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - PASTI
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 59d1913afc4ed354ea856efa2e7cc1ba, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
