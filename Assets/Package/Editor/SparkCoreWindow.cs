@@ -189,7 +189,7 @@ namespace SparkCore.Editor
                 LoadSceneEvents();
             }
 
-            GUILayout.Space(20);
+            GUILayout.Space(5);
             GUILayout.Label("Settings", h1Style);
             showFullEventName = GUILayout.Toggle(showFullEventName, "Show Full Path");
         }
@@ -219,7 +219,7 @@ namespace SparkCore.Editor
                 Repaint();
             }
 
-            GUILayout.Space(20);
+            GUILayout.Space(5);
             GUILayout.Label("Settings", h1Style);
             showTypes = GUILayout.Toggle(showTypes, "Show Types");
             ConditionalRepaint();
@@ -243,7 +243,7 @@ namespace SparkCore.Editor
         #region Fields
         private void DrawFields()
         {
-            GUILayout.Space(20);
+            GUILayout.Space(5);
             showFields = EditorGUILayout.BeginFoldoutHeaderGroup(showFields, $"{(showFields ? "-" : "+")} Fields", h1Style);
             if (showFields)
             {
@@ -323,7 +323,7 @@ namespace SparkCore.Editor
 
         private void DrawProperties()
         {
-            GUILayout.Space(20);
+            GUILayout.Space(5);
 
             showProps = EditorGUILayout.BeginFoldoutHeaderGroup(showProps, $"{(showProps ? "-" : "+")} Properties", h1Style);
             if (showProps)
@@ -404,7 +404,7 @@ namespace SparkCore.Editor
         #region Methods
         private void DrawMethods()
         {
-            GUILayout.Space(20);
+            GUILayout.Space(5);
 
             showMethods = EditorGUILayout.BeginFoldoutHeaderGroup(showMethods, $"{(showMethods ? "-" : "+")} Methods", h1Style);
             if (showMethods)
@@ -509,7 +509,7 @@ namespace SparkCore.Editor
 
         private void DrawSceneEvents()
         {
-            GUILayout.Space(20);
+            GUILayout.Space(5);
             showEvents =
                 EditorGUILayout.BeginFoldoutHeaderGroup(showEvents, $"{(showEvents ? "-" : "+")} Events", h1Style);
             if (showEvents)
