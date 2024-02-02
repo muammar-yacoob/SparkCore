@@ -2,11 +2,11 @@
 
 namespace SparkCore.Runtime.Core
 {
-    public class SceneEvent
+    public class MonoEvent
     {
         private DateTime _callTime;
         public DateTime CallTime => _callTime;
-        public SceneEvent()
+        public MonoEvent()
         {
             _callTime = DateTime.Now;
         }
