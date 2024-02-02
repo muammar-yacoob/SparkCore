@@ -2,7 +2,7 @@
 
 namespace SparkCoreDev.Demo.Scripts.Events
 {
-    public class CustomEvent : SceneEvent
+    public class CustomEvent : MonoEvent
     {
         public readonly string Message;
 

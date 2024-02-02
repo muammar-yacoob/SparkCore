@@ -78,7 +78,7 @@ namespace SparkCore.Runtime.Core
         /// <returns>List of subscribers for the event.</returns>
         public List<Delegate> GetSubscribers<T>()
         {
-            Type baseType = typeof(SceneEvent);
+            Type baseType = typeof(MonoEvent);
             var allSubscribers = new List<Delegate>();
 
             foreach (var entry in eventDictionary)

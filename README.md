@@ -118,10 +118,10 @@ An edit-time script that loads the first scene, clears the console and loads the
 The static `EventManager` class handles events publishing and subscriptions. It's an internal class to the framework and can be only accessed by `InjectableMonoBehaviour` objects.
 
 ### Usage
-**1. Creating an event:** A simple type with any necessary fields or properties, preferably with public accessors setup.
+**1. Creating an event:** Extend the `MonoEvent` type and add any necessary fields or properties, preferably with public accessors setup.
 example:
 ```csharp
-public class CustomEvent
+public class CustomEvent : MonoEvent
     {
         public readonly string Message;
 

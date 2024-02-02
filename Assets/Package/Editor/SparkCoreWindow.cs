@@ -34,17 +34,17 @@ namespace SparkCore.Editor
         private static List<PropertyDescriptor> injectedPropertiesList = new();
         private static List<MethodDescriptor> injectedMethodsList = new();
         
-        private static List<SceneEventDescriptor> sceneEventsList = new();
+        private static List<MonoEventsDescriptor> monoEventsList = new();
 
         private static SparkCoreWindow window;
         private bool showTypes;
         private static Rect hoverLayer;
         private static int currentTab;
-        private string[] tabNames = { "Injection View", "Scene Events" };
+        private string[] tabNames = { "Injection View", "Mono Events" };
         private static Rect bottomRect;
         private string helpMsg;
         private bool showEvents;
-        private List<Delegate> sceneEvents;
+        private List<Delegate> MonoEventss;
         private bool showFullEventName;
         private static Assembly defaultAssembly;
 
@@ -56,10 +56,10 @@ namespace SparkCore.Editor
         [MenuItem("Spark Core/Injection Manager &I", true, 11)]
         private static bool Validate_OpenInjectionWindow() => !Application.isPlaying;
 
-        [MenuItem("Spark Core/Scene Events", false, 12)]
+        [MenuItem("Spark Core/Mono Events", false, 12)]
         public static void OpenSceneWindow() => OpenMainWindow(1);
 
-        [MenuItem("Spark Core/Scene Events", true, 12)]
+        [MenuItem("Spark Core/Mono Events", true, 12)]
         private static bool Validate_OpenSceneWindow() => Application.isPlaying;
 
         [MenuItem("Spark Core/Help", false, 30)]
@@ -159,14 +159,17 @@ namespace SparkCore.Editor
             switch (currentTab)
             {
                 case 0:
-                    helpMsg = $"A total of {injectedFieldsList.Count} fields were detected.";
+                    int total = injectedFieldsList.Count + injectedPropertiesList.Count + injectedMethodsList.Count;
+                    helpMsg = total > 0
+                        ? $"A total of {total} injections were detected."
+                        : $"Click Rescan Assembly to refresh.";
                     DrawInjectionTab();
                     break;
                 case 1:
-                    helpMsg = sceneEventsList.Count > 0
-                        ? $"A total of {sceneEventsList.Count} events were detected."
-                        : $"Click Load Scene Events to refresh.";
-                    DrawSceneEventsTab();
+                    helpMsg = monoEventsList.Count > 0
+                        ? $"A total of {monoEventsList.Count} events were detected."
+                        : $"Click Load Mono Events to refresh.";
+                    DrawMonoEventsTab();
                     break;
                 default:
                     //Debug.Log(currentTab);
@@ -174,7 +177,7 @@ namespace SparkCore.Editor
             }
         }
 
-        private void DrawSceneEventsTab()
+        private void DrawMonoEventsTab()
         {
             GUILayout.Space(10);
             if (!EditorApplication.isPlaying)
@@ -184,10 +187,10 @@ namespace SparkCore.Editor
             }
 
             
-            DrawSceneEvents();
-            if (GUILayout.Button("Load Scene Events"))
+            DrawMonoEvents();
+            if (GUILayout.Button("Load Mono Events"))
             {
-                LoadSceneEvents();
+                LoadMonoEvents();
             }
 
             GUILayout.Space(5);
@@ -304,8 +307,8 @@ namespace SparkCore.Editor
                 {
                     if (field.GetCustomAttribute<Inject>() != null)
                     {
-                        // if (field.FieldType.IsAssignableFrom(typeof(ISceneEventHistory)) ||
-                        //     field.FieldType.IsAssignableFrom(typeof(ISceneEventProvider)))
+                        // if (field.FieldType.IsAssignableFrom(typeof(IMonoEventsHistory)) ||
+                        //     field.FieldType.IsAssignableFrom(typeof(IMonoEventsProvider)))
                         //     continue;
 
                         var results = AssetDatabase.FindAssets((type.Name));
@@ -385,8 +388,8 @@ namespace SparkCore.Editor
                 {
                     if (property.GetCustomAttribute<Inject>() != null)
                     {
-                        // if (property.PropertyType.IsAssignableFrom(typeof(ISceneEventHistory)) ||
-                        //     property.PropertyType.IsAssignableFrom(typeof(ISceneEventProvider)))
+                        // if (property.PropertyType.IsAssignableFrom(typeof(IMonoEventsHistory)) ||
+                        //     property.PropertyType.IsAssignableFrom(typeof(IMonoEventsProvider)))
                         //     continue;
 
                         var results = AssetDatabase.FindAssets((type.Name));
@@ -466,8 +469,8 @@ namespace SparkCore.Editor
                 {
                     if (method.GetCustomAttribute<Inject>() != null)
                     {
-                        // if (method.ReturnType.IsAssignableFrom(typeof(ISceneEventHistory)) ||
-                        //     method.ReturnType.IsAssignableFrom(typeof(ISceneEventProvider)))
+                        // if (method.ReturnType.IsAssignableFrom(typeof(IMonoEventsHistory)) ||
+                        //     method.ReturnType.IsAssignableFrom(typeof(IMonoEventsProvider)))
                         //     continue;
 
                         var results = AssetDatabase.FindAssets((type.Name));
@@ -483,17 +486,17 @@ namespace SparkCore.Editor
         #endregion
         #endregion
 
-        private void LoadSceneEvents()
+        private void LoadMonoEvents()
         {
-            sceneEventsList.Clear();
-            var sceneEvents = EventManager.Instance.GetSubscribers<SceneEvent>();
-            foreach (var sceneEvent in sceneEvents)
+            monoEventsList.Clear();
+            var MonoEventss = EventManager.Instance.GetSubscribers<MonoEvent>();
+            foreach (var MonoEvents in MonoEventss)
             {
-                sceneEventsList.Add(new SceneEventDescriptor(sceneEvent, sceneEvent.Method.GetParameters()[0].ParameterType));
+                monoEventsList.Add(new MonoEventsDescriptor(MonoEvents, MonoEvents.Method.GetParameters()[0].ParameterType));
             }
         }
         
-        private void DrawSceneEvents()
+        private void DrawMonoEvents()
         {
             GUILayout.Space(5);
             showEvents =
@@ -501,20 +504,20 @@ namespace SparkCore.Editor
             
             if (showEvents)
             {
-                if (sceneEventsList == null) return;
-                if (sceneEventsList.Count < 1) LoadSceneEvents();
+                if (monoEventsList == null) return;
+                if (monoEventsList.Count < 1) LoadMonoEvents();
 
-                var maxSectionHeight = Mathf.Min(sceneEventsList.Count * 30, Screen.height / 1.1f);
+                var maxSectionHeight = Mathf.Min(monoEventsList.Count * 30, Screen.height / 1.1f);
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true),
                     GUILayout.Height(maxSectionHeight));
-                foreach (var item in sceneEventsList)
+                foreach (var item in monoEventsList)
                 {
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(10);
 
-                    string eventSubscriberNamespace = item.SceneEvent.Method.DeclaringType.Namespace;
-                    string eventSubscriberClass = item.SceneEvent.Method.DeclaringType.Name;
-                    string eventSubscriberHandler = item.SceneEvent.Method.Name;
+                    string eventSubscriberNamespace = item.MonoEvents.Method.DeclaringType.Namespace;
+                    string eventSubscriberClass = item.MonoEvents.Method.DeclaringType.Name;
+                    string eventSubscriberHandler = item.MonoEvents.Method.Name;
                     string eventSubscriberType = item.EventType.Name;
 
                     string caption = ($"{(showFullEventName ? $"{eventSubscriberNamespace}." : "")}" +
@@ -617,14 +620,14 @@ namespace SparkCore.Editor
         }
     }
 
-    public class SceneEventDescriptor
+    public class MonoEventsDescriptor
     {
-        public Delegate SceneEvent { get; private set; }
+        public Delegate MonoEvents { get; private set; }
         public Type EventType { get; private set; }
 
-        public SceneEventDescriptor(Delegate sceneEvent, Type eventType)
+        public MonoEventsDescriptor(Delegate monoEvents, Type eventType)
         {
-            SceneEvent = sceneEvent;
+            MonoEvents = monoEvents;
             EventType = eventType;
         }
     }
