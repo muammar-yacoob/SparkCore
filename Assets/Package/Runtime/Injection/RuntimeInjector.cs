@@ -101,7 +101,7 @@ namespace SparkCore.Runtime.Injection
                     if (!serviceType.IsAbstract && !serviceType.IsInterface)
                         return CreateInstance(serviceType);
 
-                    throw new InvalidOperationException($"Service of type {serviceType.Name} is not registered.");
+                    throw new InvalidOperationException($"Service of type {serviceType.Name} is not registered. Make sure at least one of its implementation is marked with the ServiceProvider attribute");
                 }
             }
 
