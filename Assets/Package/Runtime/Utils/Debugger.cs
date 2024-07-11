@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,7 +15,7 @@ namespace SparkCore.Runtime.Utils
             if (SceneManager.GetActiveScene().buildIndex != 0)
             {
                 Debug.Log($"Debugger loading {SceneManager.GetSceneByBuildIndex(0).name}");
-                await SceneManager.LoadSceneAsync(0);
+				SceneManager.LoadSceneAsync(0);
             }
 
             if (clearConsoleOnPlay) ClearConsole();
