@@ -135,24 +135,24 @@ namespace SparkCore.Runtime.Injection
             if (typeof(MonoBehaviour).IsAssignableFrom(type))
             {
                 Debug.LogWarning(
-                    $"[{contextName}] Attempted to create MonoBehaviour {type.Name} using the container. Searching for existing instance in scene.");
+                    $"[{contextName}] Attempted to create MonoBehaviour {type.Name} using the container. Searching for existing instance in scene.",context);
                 var existingInstance = UnityEngine.Object.FindObjectOfType(type) as MonoBehaviour;
                 if (existingInstance != null)
                 {
                     Debug.LogWarning(
-                        $"[{contextName}] Found existing instance of {type.Name} in scene. Using this instance, but consider refactoring to avoid this.");
+                        $"[{contextName}] Found existing instance of {type.Name} in scene. Using this instance, but consider refactoring to avoid this.",context);
                     return existingInstance;
                 }
                 else if (context != null)
                 {
                     Debug.LogWarning(
-                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene. Adding it as a component to the requesting object.");
+                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene. Adding it as a component to the requesting object.",context);
                     return context.gameObject.AddComponent(type);
                 }
                 else
                 {
                     Debug.LogError(
-                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene, and no context provided to add it as a component. MonoBehaviours should be added using AddComponent().");
+                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene, and no context provided to add it as a component. MonoBehaviours should be added using AddComponent().",context);
                     throw new InvalidOperationException(
                         $"Cannot create MonoBehaviour {type.Name} using the container. Use AddComponent() instead.");
                 }
