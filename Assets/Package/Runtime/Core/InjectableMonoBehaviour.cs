@@ -27,7 +27,7 @@ namespace SparkCore.Runtime.Core
             InjectMethods(injectableMonoBehaviour, container);
         }
 
-        private static void InjectFields(object injectableMonoBehaviour, Container container)
+        private void InjectFields(object injectableMonoBehaviour, Container container)
         {
             var fields = injectableMonoBehaviour.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(f => f.IsDefined(typeof(Inject), true));
@@ -36,12 +36,12 @@ namespace SparkCore.Runtime.Core
             {
                 var injectAttribute = field.GetCustomAttribute<Inject>();
                 var typeToInject = injectAttribute?.ImplementationType ?? field.FieldType;
-                var resolvedInstance = container.Resolve(typeToInject);
+                var resolvedInstance = container.Resolve(typeToInject, null, this);
                 field.SetValue(injectableMonoBehaviour, resolvedInstance);
             }
         }
 
-        private static void InjectProperties(object injectableMonoBehaviour, Container container)
+        private void InjectProperties(object injectableMonoBehaviour, Container container)
         {
             var properties = injectableMonoBehaviour.GetType()
                 .GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -51,12 +51,12 @@ namespace SparkCore.Runtime.Core
             {
                 var injectAttribute = property.GetCustomAttribute<Inject>();
                 var typeToInject = injectAttribute?.ImplementationType ?? property.PropertyType;
-                var resolvedInstance = container.Resolve(typeToInject);
+                var resolvedInstance = container.Resolve(typeToInject, null, this);
                 property.SetValue(injectableMonoBehaviour, resolvedInstance);
             }
         }
 
-        private static void InjectMethods(object injectableMonoBehaviour, Container container)
+        private void InjectMethods(object injectableMonoBehaviour, Container container)
         {
             var methods = injectableMonoBehaviour.GetType()
                 .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -66,10 +66,11 @@ namespace SparkCore.Runtime.Core
             {
                 var injectAttribute = method.GetCustomAttribute<Inject>();
                 var typeToInject = injectAttribute?.ImplementationType ?? method.GetParameters().First().ParameterType;
-                var resolvedInstance = container.Resolve(typeToInject);
-                method.Invoke(injectableMonoBehaviour, new[] {resolvedInstance});
+                var resolvedInstance = container.Resolve(typeToInject, null, this);
+                method.Invoke(injectableMonoBehaviour, new[] { resolvedInstance });
             }
         }
+
         #endregion
 
         #region Event Subscriptions

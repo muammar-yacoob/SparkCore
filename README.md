@@ -29,6 +29,7 @@ https://github.com/muammar-yacoob/SparkCore.git?path=Assets/Package
 ### Dependency Injection
 As Unity's MonoBehaviours do not expose constructors; Types deriving from `InjectableMonoBehaviour` can have their dependencies injected using the `[Inject]` annotation.
 
+#### <li> POCO Service Injection </li>
 For services to be injectable, they need to be decorated using the `[ServiceProvider]` you can explicitly register the service to be transient using the runtime type parameter as such `[ServiceProvider(ServiceLifetime.Transient)]` otherwise, it will default to [ServiceProvider(ServiceLifetime.Singleton)]
 
 example:
@@ -87,6 +88,19 @@ When your project has multiple implementations of an `IService` per say, it's be
 ```csharp
 [Inject(typeof(ConcreteService))] private IService service;
 ```
+
+
+#### <li> MonoBehaviour injection </li>
+When injecting MonoBehaviours, SparkCore follows these steps:
+
+1. Searches for an existing instance of the MonoBehaviour in the scene.
+2. If found, uses the existing instance.
+3. If not found, adds the MonoBehaviour as a component to the requesting object.
+4. Logs a warning to indicate that a MonoBehaviour was automatically added.
+
+This approach allows for more flexible use of MonoBehaviours in your dependency injection setup, but it's recommended to manage MonoBehaviour lifecycles explicitly when possible.
+
+<br>
 
 #### Singleton vs Transient Services
 Notice how services registered as singletons will maintain the same guid between different service users and scenes.
