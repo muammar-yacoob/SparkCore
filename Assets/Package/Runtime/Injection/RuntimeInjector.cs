@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using SparkCore.Runtime.Utils;
 using UnityEngine;
+using SparkCore.Runtime.Core;
 
 namespace SparkCore.Runtime.Injection
 {
@@ -31,22 +32,19 @@ namespace SparkCore.Runtime.Injection
             {
                 var lifetime = type.GetCustomAttribute<ServiceProvider>()?.ServiceLifetime ?? ServiceLifetime.Transient;
 
-                // Find interfaces implemented by the type
-                var serviceTypes = type.GetInterfaces();
-                foreach (var serviceType in serviceTypes)
-                {
-                    object implementationInstance = null;
-                    if (lifetime == ServiceLifetime.Singleton)
-                    {
-                        implementationInstance = Activator.CreateInstance(type);
-                    }
+                // Register the concrete type itself
+                services.Add(new ServiceDescriptor(type, type, lifetime));
+                Debug.Log($"{type.Name} registered as {lifetime}");
 
-                    services.Add(new ServiceDescriptor(serviceType, type, lifetime, implementationInstance));
+                // Register interfaces implemented by the type
+                foreach (var serviceType in type.GetInterfaces())
+                {
+                    services.Add(new ServiceDescriptor(serviceType, type, lifetime));
                     Debug.Log($"{serviceType.Name} -> {type.Name} registered as {lifetime}");
                 }
             }
 
-            Debug.Log($"{injectableTypes.Count} types registered");
+            Debug.Log($"{services.Count} services registered.");
             return new Container(services);
         }
     }
@@ -78,38 +76,46 @@ namespace SparkCore.Runtime.Injection
             _serviceDescriptors = serviceDescriptors ?? throw new ArgumentNullException(nameof(serviceDescriptors));
         }
 
-        public object Resolve(Type serviceType, Type implementationType = null)
+        public void Register(Type serviceType, Type implementationType, ServiceLifetime lifetime)
         {
+            _serviceDescriptors.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
+        }
+
+        public void Register<TService, TImplementation>(ServiceLifetime lifetime)
+            where TImplementation : TService
+        {
+            Register(typeof(TService), typeof(TImplementation), lifetime);
+        }
+
+        public object Resolve(Type serviceType, Type implementationType = null, InjectableMonoBehaviour context = null)
+        {
+            Debug.Log($"Attempting to resolve {serviceType.Name}");
             ServiceDescriptor descriptor;
+
             if (implementationType != null)
             {
-                descriptor = _serviceDescriptors
-                    .FirstOrDefault(x => x.ImplementationType == implementationType);
-                if (descriptor == null)
-                {
-                    throw new InvalidOperationException(
-                        $"Concrete implementation of type {implementationType.Name} is not registered.");
-                }
+                descriptor = _serviceDescriptors.FirstOrDefault(x => x.ImplementationType == implementationType);
             }
             else
             {
-                descriptor = _serviceDescriptors
-                    .FirstOrDefault(x => x.ServiceType == serviceType);
-                if (descriptor == null)
-                {
-                    // Fallback for concrete types not explicitly registered
-                    if (!serviceType.IsAbstract && !serviceType.IsInterface)
-                        return CreateInstance(serviceType);
+                descriptor = _serviceDescriptors.FirstOrDefault(x => x.ServiceType == serviceType) ??
+                             _serviceDescriptors.FirstOrDefault(x => x.ImplementationType == serviceType);
+            }
 
-                    throw new InvalidOperationException($"Service of type {serviceType.Name} is not registered. Make sure at least one of its implementation is marked with the ServiceProvider attribute");
-                }
+            if (descriptor == null)
+            {
+                if (!serviceType.IsAbstract && !serviceType.IsInterface)
+                    return CreateInstance(serviceType, context);
+
+                throw new InvalidOperationException(
+                    $"Service of type {serviceType.Name} is not registered. Make sure it is marked with the ServiceProvider attribute");
             }
 
             if (descriptor.Lifetime == ServiceLifetime.Singleton && descriptor.Implementation != null)
                 return descriptor.Implementation;
 
             var typeToCreate = implementationType ?? descriptor.ImplementationType ?? serviceType;
-            var implementation = CreateInstance(typeToCreate);
+            var implementation = CreateInstance(typeToCreate, context);
 
             if (descriptor.Lifetime == ServiceLifetime.Singleton)
                 descriptor.Implementation = implementation;
@@ -117,21 +123,78 @@ namespace SparkCore.Runtime.Injection
             return implementation;
         }
 
-        public T Resolve<T>(Type implementationType = null)
+        public T Resolve<T>(Type implementationType = null, InjectableMonoBehaviour context = null)
         {
-            return (T)Resolve(typeof(T), implementationType);
+            return (T)Resolve(typeof(T), implementationType, context);
         }
 
-        private object CreateInstance(Type type)
+        private object CreateInstance(Type type, InjectableMonoBehaviour context = null)
         {
-            var constructorInfo = type.GetConstructors().FirstOrDefault();
-            if (constructorInfo == null)
-                throw new InvalidOperationException($"No public constructor found for {type.Name}.");
+            string contextName = context != null ? context.GetType().Name : "Unknown";
 
-            var parameters = constructorInfo.GetParameters()
-                .Select(x => Resolve(x.ParameterType)).ToArray();
+            if (typeof(MonoBehaviour).IsAssignableFrom(type))
+            {
+                Debug.LogWarning(
+                    $"[{contextName}] Attempted to create MonoBehaviour {type.Name} using the container. Searching for existing instance in scene.");
+                var existingInstance = UnityEngine.Object.FindObjectOfType(type) as MonoBehaviour;
+                if (existingInstance != null)
+                {
+                    Debug.LogWarning(
+                        $"[{contextName}] Found existing instance of {type.Name} in scene. Using this instance, but consider refactoring to avoid this.");
+                    return existingInstance;
+                }
+                else if (context != null)
+                {
+                    Debug.LogWarning(
+                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene. Adding it as a component to the requesting object.");
+                    return context.gameObject.AddComponent(type);
+                }
+                else
+                {
+                    Debug.LogError(
+                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene, and no context provided to add it as a component. MonoBehaviours should be added using AddComponent().");
+                    throw new InvalidOperationException(
+                        $"Cannot create MonoBehaviour {type.Name} using the container. Use AddComponent() instead.");
+                }
+            }
 
-            return Activator.CreateInstance(type, parameters);
+            var constructors =
+                type.GetConstructors(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+            if (constructors.Length == 0)
+                throw new InvalidOperationException($"[{contextName}] No constructor found for {type.Name}.");
+
+            // Sort constructors by parameter count (descending)
+            var constructor = constructors.OrderByDescending(c => c.GetParameters().Length).First();
+
+            var parameters = new List<object>();
+            foreach (var param in constructor.GetParameters())
+            {
+                try
+                {
+                    var resolvedParam = Resolve(param.ParameterType, null, context);
+                    parameters.Add(resolvedParam);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    if (param.HasDefaultValue)
+                        parameters.Add(param.DefaultValue);
+                    else
+                        throw new InvalidOperationException(
+                            $"[{contextName}] Failed to resolve parameter {param.Name} of type {param.ParameterType.Name} for {type.Name}",
+                            ex);
+                }
+            }
+
+            try
+            {
+                return constructor.Invoke(parameters.ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"[{contextName}] Failed to create instance of {type.Name}. Constructor parameters: {string.Join(", ", parameters.Select(p => p?.GetType().Name ?? "null"))}",
+                    ex);
+            }
         }
     }
 }
