@@ -26,21 +26,25 @@ namespace SparkCore.Runtime.Injection
             var injectableTypes = scriptAssemblies
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.GetCustomAttribute<ServiceProvider>() != null)
+                .OrderBy(t => t.GetCustomAttribute<ServiceProvider>().Order)
                 .ToList();
 
             foreach (var type in injectableTypes)
             {
-                var lifetime = type.GetCustomAttribute<ServiceProvider>()?.ServiceLifetime ?? ServiceLifetime.Transient;
+                var serviceProviderAttr = type.GetCustomAttribute<ServiceProvider>();
+                var lifetime = serviceProviderAttr.ServiceLifetime;
+                var order = serviceProviderAttr.Order;
 
                 // Register the concrete type itself
-                services.Add(new ServiceDescriptor(type, type, lifetime));
-                Debug.Log($"{type.Name} registered as {lifetime}");
+                services.Add(new ServiceDescriptor(type, type, lifetime, order));
+                var debugMessage = $"{type.Name} registered as {lifetime}";
+                var orderMessage = order == Int32.MaxValue ? $" with default order." : $" with order {order}.";
+                Debug.Log(debugMessage + orderMessage);
 
                 // Register interfaces implemented by the type
                 foreach (var serviceType in type.GetInterfaces())
                 {
-                    services.Add(new ServiceDescriptor(serviceType, type, lifetime));
-                    Debug.Log($"{serviceType.Name} -> {type.Name} registered as {lifetime}");
+                    services.Add(new ServiceDescriptor(serviceType, type, lifetime, order));
                 }
             }
 
@@ -55,30 +59,33 @@ namespace SparkCore.Runtime.Injection
         public Type ImplementationType { get; private set; }
         public object Implementation { get; internal set; }
         public ServiceLifetime Lifetime { get; }
+        public int? Order { get; }
 
         public ServiceDescriptor(Type serviceType, Type implementationType, ServiceLifetime lifetime,
-            object implementation = null)
+            int? order, object implementation = null)
         {
             ServiceType = serviceType ?? throw new ArgumentNullException(nameof(serviceType));
-            ImplementationType = implementationType ?? throw new ArgumentNullException(nameof(implementationType));
+            ImplementationType =
+                implementationType ?? throw new ArgumentNullException(nameof(implementationType));
             Lifetime = lifetime;
+            Order = order;
             Implementation = implementation;
         }
     }
 
-
     public class Container
     {
-        private readonly List<ServiceDescriptor> _serviceDescriptors;
+        private readonly List<ServiceDescriptor> serviceDescriptors;
 
         public Container(List<ServiceDescriptor> serviceDescriptors)
         {
-            _serviceDescriptors = serviceDescriptors ?? throw new ArgumentNullException(nameof(serviceDescriptors));
+            this.serviceDescriptors =
+                serviceDescriptors ?? throw new ArgumentNullException(nameof(serviceDescriptors));
         }
 
-        public void Register(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+        public void Register(Type serviceType, Type implementationType, ServiceLifetime lifetime, int? order = null)
         {
-            _serviceDescriptors.Add(new ServiceDescriptor(serviceType, implementationType, lifetime));
+            serviceDescriptors.Add(new ServiceDescriptor(serviceType, implementationType, lifetime, order));
         }
 
         public void Register<TService, TImplementation>(ServiceLifetime lifetime)
@@ -87,19 +94,24 @@ namespace SparkCore.Runtime.Injection
             Register(typeof(TService), typeof(TImplementation), lifetime);
         }
 
-        public object Resolve(Type serviceType, Type implementationType = null, InjectableMonoBehaviour context = null)
+        public object Resolve(Type serviceType, Type implementationType = null,
+            InjectableMonoBehaviour context = null)
         {
-            Debug.Log($"Attempting to resolve {serviceType.Name}");
             ServiceDescriptor descriptor;
 
             if (implementationType != null)
             {
-                descriptor = _serviceDescriptors.FirstOrDefault(x => x.ImplementationType == implementationType);
+                descriptor = serviceDescriptors
+                    .Where(x => x.ImplementationType == implementationType)
+                    .OrderBy(x => x.Order)
+                    .FirstOrDefault();
             }
             else
             {
-                descriptor = _serviceDescriptors.FirstOrDefault(x => x.ServiceType == serviceType) ??
-                             _serviceDescriptors.FirstOrDefault(x => x.ImplementationType == serviceType);
+                descriptor = serviceDescriptors
+                    .Where(x => x.ServiceType == serviceType || x.ImplementationType == serviceType)
+                    .OrderBy(x => x.Order)
+                    .FirstOrDefault();
             }
 
             if (descriptor == null)
@@ -135,24 +147,28 @@ namespace SparkCore.Runtime.Injection
             if (typeof(MonoBehaviour).IsAssignableFrom(type))
             {
                 Debug.LogWarning(
-                    $"[{contextName}] Attempted to create MonoBehaviour {type.Name} using the container. Searching for existing instance in scene.",context);
+                    $"[{contextName}] Attempted to create MonoBehaviour {type.Name} using the container. Searching for existing instance in scene.",
+                    context);
                 var existingInstance = UnityEngine.Object.FindObjectOfType(type) as MonoBehaviour;
                 if (existingInstance != null)
                 {
                     Debug.LogWarning(
-                        $"[{contextName}] Found existing instance of {type.Name} in scene. Using this instance, but consider refactoring to avoid this.",context);
+                        $"[{contextName}] Found existing instance of {type.Name} in scene. Using this instance, but consider refactoring to avoid this.",
+                        context);
                     return existingInstance;
                 }
                 else if (context != null)
                 {
                     Debug.LogWarning(
-                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene. Adding it as a component to the requesting object.",context);
+                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene. Adding it as a component to the requesting object.",
+                        context);
                     return context.gameObject.AddComponent(type);
                 }
                 else
                 {
                     Debug.LogError(
-                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene, and no context provided to add it as a component. MonoBehaviours should be added using AddComponent().",context);
+                        $"[{contextName}] No existing instance of MonoBehaviour {type.Name} found in scene, and no context provided to add it as a component. MonoBehaviours should be added using AddComponent().",
+                        context);
                     throw new InvalidOperationException(
                         $"Cannot create MonoBehaviour {type.Name} using the container. Use AddComponent() instead.");
                 }
