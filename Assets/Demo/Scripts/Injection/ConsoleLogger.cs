@@ -13,7 +13,7 @@ namespace SparkCoreDev.Demo.Scripts.Injection
         public void Log(string message) => Debug.Log($"<color=yellow>ConsoleLogger: {guid}</color> {message}");
     }
     
-    [ServiceProvider(ServiceLifetime.Transient)]
+    [ServiceProvider(ServiceLifetime.Transient, order:1)]
     public class AnotherLogger : ILogger
     {
         private readonly Guid guid;

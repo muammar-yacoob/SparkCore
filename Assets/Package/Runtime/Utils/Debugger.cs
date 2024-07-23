@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,7 @@ namespace SparkCore.Runtime.Utils
 {
     public class Debugger : MonoBehaviour
     {
-        [SerializeField] private bool clearConsoleOnPlay = false;
+        [SerializeField] private bool clearConsoleOnPlay;
         private async void Awake()
         {
 #if UNITY_EDITOR
@@ -15,7 +16,7 @@ namespace SparkCore.Runtime.Utils
             if (SceneManager.GetActiveScene().buildIndex != 0)
             {
                 Debug.Log($"Debugger loading {SceneManager.GetSceneByBuildIndex(0).name}");
-				SceneManager.LoadSceneAsync(0);
+				await SceneManager.LoadSceneAsync(0);
             }
 
             if (clearConsoleOnPlay) ClearConsole();
