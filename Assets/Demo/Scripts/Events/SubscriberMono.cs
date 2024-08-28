@@ -11,7 +11,7 @@ namespace SparkCoreDev.Demo.Scripts.Events
 
         void HandleCustomEvent(CustomEvent customEvent)
         {
-            Debug.Log($"[Mono] Received event: {customEvent.Message} at {customEvent.CallTime}");
+            Debug.Log($"[Mono] Received event: {customEvent.Message} at {customEvent.CallTime}",this);
         }
     }
 }

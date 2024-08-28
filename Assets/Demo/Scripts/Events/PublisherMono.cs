@@ -8,9 +8,15 @@ namespace SparkCoreDev.Demo.Scripts.Events
         {
             var customEvent = new CustomEvent("Hello Mono Events from PublisherMono!");
             PublishEvent(customEvent);
-            
+
             // SubscriberPOCO subscriberPoco = new SubscriberPOCO();
             // PublisherPOCO publisherPoco = new PublisherPOCO();
+        }
+
+        private void AnotherMethod()
+        {
+            PublishEvent(new CustomEvent("Hello Mono Events from AnotherMethod!"));
+            PublishEvent(new GameStartedEvent());
         }
     }
 }
