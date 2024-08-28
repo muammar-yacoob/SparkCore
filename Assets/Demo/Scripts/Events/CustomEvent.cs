@@ -11,4 +11,8 @@ namespace SparkCoreDev.Demo.Scripts.Events
             Message = message;
         }
     }
+    
+    public class GameStartedEvent : MonoEvent
+    {
+    }
 }
