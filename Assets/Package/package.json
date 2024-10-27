@@ -1,6 +1,6 @@
 {
   "name": "com.sparkgames.sparkcore",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "displayName": "Spark Core",
   "description": "Core library for common Unity Projects.",
   "unity": "2021.3",

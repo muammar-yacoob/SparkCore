@@ -97,7 +97,7 @@ namespace SparkCore.Runtime.Core
             }
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             foreach (var unsubscribeAction in delegateToUnsubscribeAction.Values)
             {
