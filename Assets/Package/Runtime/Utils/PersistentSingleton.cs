@@ -1,12 +1,25 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
-namespace SparkCore.Runtime.Utils
+namespace SparkGames.SparkCore.Utils
 {
     public abstract class PersistentSingleton<T> : Singleton<T> where T : MonoBehaviour
     {
         protected override void Awake()
         {
             base.Awake();
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+
+    public abstract class SingletonNetworkBehaviour<T> : NetworkBehaviour where T : NetworkBehaviour
+    {
+        public static T Instance { get; private set; }
+
+        protected virtual void Awake()
+        {
+            if(Instance != null && Instance != this) Destroy(gameObject);
+            Instance = this as T;
             DontDestroyOnLoad(gameObject);
         }
     }
