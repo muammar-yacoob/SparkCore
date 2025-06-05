@@ -1,5 +1,4 @@
-﻿using Unity.Netcode;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SparkGames.SparkCore.Utils
 {
@@ -12,7 +11,7 @@ namespace SparkGames.SparkCore.Utils
         }
     }
 
-    public abstract class SingletonNetworkBehaviour<T> : NetworkBehaviour where T : NetworkBehaviour
+    public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         public static T Instance { get; private set; }
 
@@ -20,7 +19,6 @@ namespace SparkGames.SparkCore.Utils
         {
             if(Instance != null && Instance != this) Destroy(gameObject);
             Instance = this as T;
-            DontDestroyOnLoad(gameObject);
         }
     }
 }
